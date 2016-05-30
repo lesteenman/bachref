@@ -1,0 +1,5 @@
+*.mcrl2
+*.lps
+*.lts
+*.swp
+*.pyc

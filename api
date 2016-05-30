@@ -1,0 +1,137 @@
+model:
+	opt: <sorts>
+	<actors>
+
+sorts:
+	sorts: {
+		<sort>
+		...
+	}
+
+sort:
+	<identifier>: <struct>
+
+struct:
+	Struct(<item>, ...)
+
+
+actors:
+	actors: {
+		<actor>
+		...
+	}
+
+actor:
+	<identifier>: {
+		opt: <instances>
+		opt: <states>
+		opt: <actions>
+		opt: <guards>
+	}
+
+instances:
+	instances: {
+		<instance>
+		...
+		OR
+		<assignment>
+		...
+	}
+
+instance:
+	<identifier>: {
+		<assignment>
+		...
+	}
+
+states:
+	states: {
+		<state>
+		...
+	}
+
+state:
+	<identifier>: <type>
+
+actions:
+	actions: {
+		<action>
+		...
+	}
+
+action:
+	<identifier>(<parameter_type> ...): {
+		function_block
+	}
+
+guards:
+	guards: {
+		<guarded_actor>
+		...
+	}
+
+guarded_actor:
+	<actor>: {
+		<guarded_function>
+		...
+	}
+
+guarded_function:
+	<function_identifier>: <function_block>
+
+function_block:
+	<ifelse>
+	OR
+	<function>
+
+ifelse:
+	if (<condition>) <function_block>
+	opt: elseif (<condition>) <function_block>
+	opt: ...
+	opt: else (<condition>) <function_block>
+
+condition:
+	comp
+	OR
+	comp && conditional
+	OR
+	comp || conditional
+
+comp:
+	prop == val
+	OR
+	prop != val
+	OR
+	prop < val
+	OR
+	prop > val
+	OR
+	prop <= val
+	OR
+	prop >= val
+	OR
+
+function:
+	-> <parameter>* {
+		assignment*
+	}
+
+parameter:
+	<identifier>
+	OR
+	Other(<Type>)
+	OR
+	Any(<Type>)
+	OR
+	Not(<Type>: <val>, ...)
+
+assignment:
+	<prop> = <val>
+
+value:
+	<identifier>
+	OR
+	"string"
+
+state:
+	<identifier>: <type>

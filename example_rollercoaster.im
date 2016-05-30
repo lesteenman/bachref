@@ -1,0 +1,192 @@
+sorts: {
+	Segment: struct(station, lift, main, braking, repair)
+	Cart_Id: struct(cart1, cart2)
+}
+
+actors: {
+	cart: {
+		states: {
+			id: Cart_Id
+			pos: Segment
+			open: Bool
+			locked: Bool
+		}
+
+		instances: {
+			cart1: {
+				id = cart1
+				pos = braking
+				open = false
+				locked = false
+			}
+			cart2: {
+				id = cart2
+				pos = repair
+				open = false
+				locked = false
+			}
+		}
+
+		actions: {
+			forward(Cart_Id, Segment, Segment): {
+				if (open == true) {
+					if (pos == station) {
+						-> id, station, lift {
+							pos = lift
+						}
+					}
+					elseif (pos == lift) {
+						-> id, lift, main {
+							pos = main
+						}
+					}
+					elseif (pos == main) {
+						-> id, main, braking {
+							pos = braking
+						}
+					}
+					else {
+						-> id, braking, station {
+							pos = station
+							locked = false
+						}
+					}
+				}
+			}
+
+			backward(Cart_Id, Segment, Segment): {
+				if (open == false && pos == station) {
+					-> id, station, repair {
+						pos = repair
+					}
+				}
+			}
+
+			open_braces(): {
+				if (open == false && locked == false) {
+					-> id {
+						open = true
+					}
+				}
+			}
+
+			close_braces(): {
+				if (open == true) {
+					-> id {
+						open = false
+						locked = true
+					}
+				}
+			}
+		}
+	}
+
+	track: {
+		states: {
+			c1: Segment
+			c2: Segment
+		}
+
+		instances: {
+			c1 = braking
+			c2 = repair
+		}
+
+		guards: {
+			cart: {
+				forward: {
+					-> Any(Cart_Id), station, lift {}
+					-> Any(Cart_Id), lift, main {}
+					-> Any(Cart_Id), main, braking {}
+					-> Any(Cart_Id), braking, station {}
+					-> Any(Cart_Id), repair, station {}
+				}
+				
+				backward: {
+					-> Any(Cart_Id), station, repair {}
+				}
+			}
+		}
+	}
+
+	button: {
+		states: {
+			open: Bool
+		}
+
+		instances: {
+			open = false
+		}
+
+		actions: {
+			push_button(): {
+				if (open == true) {
+					-> {
+						open = false
+					}
+				}
+			}
+		}
+
+		guards: {
+			cart: {
+				open_braces: {
+					if (open == false) {
+						-> Any(Cart_Id) {
+							open = false
+						}
+					}
+				}
+
+				close_braces: {
+					if (open == false) {
+						-> Any(Cart_Id) {}
+					}
+				}
+
+				forward: {
+					if (open == false) {
+						-> Any(Cart_Id), station, Any(Segment) {}
+					}
+					-> Any(Cart_Id), Not(Segment: station), Any(Segment) {}
+				}
+			}
+
+			gate: {
+				open: {
+					if (open == true) {
+						-> {}
+					}
+				}
+			}
+		}
+	}
+
+	gate: {
+		instances: {
+			open = false
+		}
+
+		states: {
+			open: Bool
+		}
+
+		actions: {
+			open(): {
+				if (open == false) {
+					-> {
+						open = true
+					}
+				}
+			}
+
+			close(): {
+				if (open == true) {
+					-> {
+						open = false
+					}
+				}
+			}
+		}
+	}
+}
