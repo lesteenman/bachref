@@ -41,9 +41,6 @@ class Analyzer:
         self.buildActionTable()
         self.buildActorsTable()
 
-        # pp = PrettyPrinter(depth=5)
-        # pp.pprint(self.symbolTable)
-
         if len(self.parseErrors):
             print 'Errors occured during parsing:'
             for error in self.parseErrors:
@@ -56,6 +53,7 @@ class Analyzer:
         self.parseErrors.append(str(error))
 
     def buildSortsTable(self):
+        # print self.model.sorts.dump()
         for sort in self.model.sorts:
             if sort.struct:
                 identifier = sort.identifier

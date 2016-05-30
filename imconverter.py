@@ -20,12 +20,12 @@ with open("example.im", 'r') as f:
                 out.write(mcrl2)
                 print 'Written!'
 
-                helper = Mcrl2Helper('example')
-                if helper.mcrl22lps():
-                    if helper.lps2lts():
-                        helper.graph()
+                # helper = Mcrl2Helper('example')
+                # if helper.mcrl22lps():
+                #     if helper.lps2lts():
+                #         helper.graph()
 
-exit()
+# exit()
 
 print 'Advanced Example...'
 with open("example_rollercoaster.im", 'r') as f:
@@ -43,11 +43,11 @@ with open("example_rollercoaster.im", 'r') as f:
                 out.write(mcrl2)
                 print 'Written!'
 
-                helper = Mcrl2Helper()
-                lps = helper.mcrl22lps(mcrl2)
-                if lps:
-                    lts = helper.lps2lts(lps)
-                    if lts:
-                        helper.graph(lts)
+                # helper = Mcrl2Helper()
+                # lps = helper.mcrl22lps(mcrl2)
+                # if lps:
+                #     lts = helper.lps2lts(lps)
+                #     if lts:
+                #         helper.graph(lts)
 
 print 'Now testing with MCRL2 toolchain...'
