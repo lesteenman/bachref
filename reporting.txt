@@ -1,0 +1,23 @@
+While it's quite easy to add the components piece by piece, it's still very hard to see why an action is not allowed at any point.
+There should be better debugging tools that show who allows what at any state.
+
+Not having the ability to make a proper toolset in Python is really annoying.
+
+The model is built of several parts, and has been set up this way to allow for real modular changing. Each component is only concerned with his own state, and can block actions in other actors through guards.
+
+
+
+
+
+
+
+
+
+Java Generator
+==============
+Controller (based off of the composition)
+	- A public action for each of the allowed labels
+
+Models (one for each actor)
+
+Possibly: ConsoleProgram
