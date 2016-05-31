@@ -1,27 +1,21 @@
 from pyparsing import *
 from collections import deque
 from pprint import *
+from names import Names
 
 newline = '\r\n'
 indent = '\t'
 
-# TODO: Support multiple instances. Probably translate each function to each instance.
-#       In that case, maybe Any() can be removed, just as the next ToDo.
-# TODO: Assign an Any() to a variable to use in the function block.
+# TODO: Possibly check if an action has guards, and if not, automatically rename to the trigger scheme.
+# TODO: If above, add utility function to see if an actor/action has guards.
 # TODO: Create a toolchain script
-# TODO: Translate to Java
-# TODO: Parameter checking for guards
-# TODO: Type checking for action parameters
+# TODO: Type checking (analyzer)
 
 # Naming scheme for actions: <actor>_<identifier>
 # Naming scheme for guards: <guarding_actor>_allows_<actor>_<identifier>
 # Naming scheme for triggers: <perform>_<actor>_<identifier>
 class Mcrl2Generator:
-    model = None
-    mcrl2 = []
-    line = deque([])
     debug = False
-
     current_indent = 0
 
     def __init__(self, model, symbolTable):
@@ -30,6 +24,7 @@ class Mcrl2Generator:
         self.mcrl2 = []
         self.line = deque([])
         self.errors = [];
+        self.nameGen = Names(symbolTable)
 
     def toMcrl2(self):
         self.emitActionsList(self.symbolTable['actions'])
@@ -40,9 +35,19 @@ class Mcrl2Generator:
         self.emitInit(self.symbolTable)
 
         output = ''
+        i = 0
         for line in self.mcrl2:
+            i += 1
             output += line.popleft()
+            # try:
             output += ' '.join(line)
+            # except TypeError as e:
+            #     print ''
+            #     print 'Error while appending lines'
+            #     print '\r\n'.join(output.split('\r\n')[-10:])
+            #     print ''
+            #     raise Exception('At line ' + str(i) + ': ' + str(line))
+
             output += newline
 
         return output
@@ -51,6 +56,8 @@ class Mcrl2Generator:
         tokens = list(args)
         self = tokens.pop(0)
         for t in tokens:
+            if not isinstance(t, str):
+                raise Exception('Attempting to emit a non-string type: ' + str(t))
             self.line.append(t)
 
     def startBlock(self, name):
@@ -66,9 +73,11 @@ class Mcrl2Generator:
         for i in range(num):
             s.mcrl2.pop()
 
+    # Throw away the {num} last emitted tokens in the active line.
     def tosstoken(s, num = 1):
         for i in range(num):
-            s.line.pop()
+            if len(s.line) > 0:
+                s.line.pop()
 
     # Append the active line to the mcrl2 and clear it.
     def newline(s):
@@ -77,9 +86,11 @@ class Mcrl2Generator:
         s.mcrl2.append(s.line)
         s.line = deque([])
 
+    # Increase the indentation level starting at the active line
     def indent(s):
         s.current_indent += 1
 
+    # Decrease the indentation level starting at the active line
     def unindent(s):
         s.current_indent -= 1
 
@@ -144,15 +155,27 @@ class Mcrl2Generator:
             for instance in actor['instances']:
                 action_label = instance + '_' + action['identifier']
                 if len(action['guards']) > 0:
+                    # In rare cases, the only guard will be the actor himself. Check for this.
+                    # if len(action['guards']) == 1:
+                    #     guard_actor = s.symbolTable['actors'][action['guards'][0]]
+                    #     guard_instances = guard_actor['instances']
+                    #     if len(guard_instances) == 1 and guard_instances.keys()[0] == instance:
+                    #         print 'Only guard is the actor himself, skipping! '
+                    #         print action_label
+                    #         print guard_instances
+                    #         continue
+
                     s.newline()
                     allow_label = 'perform_' + action_label
 
-                    # TODO: Instances
                     s.emit(action_label)
                     s.emit('|')
                     for guard in action['guards']:
                         guard_actor = s.symbolTable['actors'][guard]
                         for guard_instance in guard_actor['instances']:
+                            if guard_instance == instance:
+                                continue
+
                             guard_label = guard_instance + '_allows_' + action_label
                             s.emit(guard_label)
                             s.emit('|')
@@ -178,14 +201,15 @@ class Mcrl2Generator:
             s.newline()
             for instance_name, instance in actor['instances'].iteritems():
                 s.emit(instance_name)
-                s.emit('(')
-                for key, val in instance.iteritems():
-                    s.emit(key)
-                    s.emit('=')
-                    s.emit(val)
-                    s.emit(',')
-                s.tosstoken()
-                s.emit(')')
+                if len(instance):
+                    s.emit('(')
+                    for key, val in instance.iteritems():
+                        s.emit(key)
+                        s.emit('=')
+                        s.emit(val)
+                        s.emit(',')
+                    s.tosstoken()
+                    s.emit(')')
                 s.emit('||')
 
         s.tosstoken()
@@ -203,7 +227,6 @@ class Mcrl2Generator:
             guards = details['guards']
 
             for instance in actor['instances']:
-                # print 'Emitting actions for instance ' + str(instance) + ' of actor ' + str(details['actor'])
                 action = instance + '_' + details['identifier']
 
                 s.emit(action)
@@ -261,17 +284,17 @@ class Mcrl2Generator:
         for actor in actors:
             if actor.instances and len(actor.instances):
                 for instance in actor.instances:
-                    s.emitActor(actor, instance.identifier)
+                    s.emitActor(actor, actor.identifier, instance.identifier)
                     s.newline()
             else:
-                s.emitActor(actor, actor.identifier)
+                s.emitActor(actor, actor.identifier, actor.identifier)
                 s.newline()
             
-    def emitActor(s, actor, actor_id):
+    def emitActor(s, actor, actor_id, actor_instance):
         s.emit('proc')
-        s.emit(actor_id)
-        s.emit('(')
+        s.emit(actor_instance)
         if actor.states:
+            s.emit('(')
             for state in actor.states[:-1]:
                 s.emit(state.identifier)
                 s.emit(':')
@@ -281,142 +304,133 @@ class Mcrl2Generator:
             s.emit(':')
             s.emit(actor.states[-1].type)
 
-        s.emit(')')
+            s.emit(')')
+
         s.emit('=')
 
         s.newline()
         s.indent()
 
-        s.emitActions(actor, actor_id, actor.actions)
+        s.emitActions(actor_id, actor_instance, actor.actions)
 
         if len(actor.actions) and len(actor.guarded_actors):
             s.emit('+')
             s.newline()
 
         if len(actor.guarded_actors):
-            s.emitGuards(actor, actor_id, actor.guarded_actors)
+            s.emitGuards(actor_id, actor_instance, actor.guarded_actors)
 
         s.emit(';')
         s.newline()
 
         s.unindent()
 
-    def emitActions(s, actor, actor_id, actions):
+    def emitActions(s, actor_id, actor_instance, actions):
         if len(actions):
             for action in actions:
                 identifier = action.identifier
                 params = action.parameter_types
-                function = action.function_block
+                function = action.function_blocks
 
-                s.emitFunctionBlock(actor, actor_id, identifier, function)
+                s.emitFunctionBlocks(actor_id, actor_instance, identifier, function)
                 s.emit('+')
                 s.newline()
             s.tossline(1)
-
-    # Should be called with a list of lists for the repetitions.
-    def emitRecursiveFunction(s, actor, actor_id, function_id, function, repetitions, params, guards):
-        if len(repetitions):
-            new_repetitions = list(repetitions)
-            repetition = new_repetitions.pop(0)
-            for r in repetition:
-                new_params = list(params)
-                new_params.append(r)
-                s.emitRecursiveFunction(actor, actor_id, function_id, function, new_repetitions, new_params, guards)
-        else:
-            # s.startBlock('recursiveFunction')
-            if guards is None:
-                action_label = actor_id + '_' + function_id
-            else:
-                action_label = actor_id + '_allows_' + guards + '_' + function_id
-
-            s.emit(action_label)
-
-            if len(params):
-                s.emit('(')
-                for parameter in params[:-1]:
-                    s.emit(parameter)
-                    s.emit(',')
-                s.emit(params[-1])
-                s.emit(')')
-            s.emit('.')
-
-            s.emit(actor_id)
-            s.emit('(')
-
-            for assignment in function.assignments[:-1]:
-                s.emit(assignment.prop)
-                s.emit('=')
-                s.emit(assignment.val)
-                s.emit(',')
-
-            if len(function.assignments) > 0:
-                s.emit(function.assignments[-1].prop)
-                s.emit('=')
-                s.emit(function.assignments[-1].val)
-            s.emit(')')
-            s.newline()
-            s.emit('+')
-            s.newline()
-            # s.endBlock('recursiveFunction')
                     
 
-    def emitFunction(s, actor, actor_id, function_id, function, guards):
-        s.startBlock('function')
+    def emitFunction(s, actor_id, actor_instance, guarded_actor_instance, function_id, assignments, parameters):
+        if guarded_actor_instance:
+            action_label = actor_instance + '_allows_' + guarded_actor_instance + '_' + function_id
+        else:
+            action_label = actor_instance + '_' + function_id
 
-        repetitions = []
-        simpleParams = []
-        if function.parameters:
-            # First check for any/other parameter types.
-            simpleParams = []
-            for parameter in function.parameters:
-                if parameter.anyst:
-                    struct = s.symbolTable['sorts'][parameter.type]
-                    repetitions.append(struct['items'])
-                elif parameter.otherst:
-                    # TODO: Do for all struct entries that are not used as an identifier by this instance.
-                    # TODO: Remove?
-                    print 'Other found! ' + str(parameter.type)
-                elif parameter.notst:
-                    items = []
-                    struct = s.symbolTable['sorts'][parameter.type]
-                    for i in struct['items']:
-                        if i not in parameter.identifiers:
-                            items.append(i)
-                    repetitions.append(items)
-                else:
-                    simpleParams.append(parameter.identifier)
+        s.emit(action_label)
 
-        s.startBlock('recursive function')
-        s.emitRecursiveFunction(actor, actor_id, function_id, function, repetitions, simpleParams, guards)
-        s.endBlock('recursive function')
+        if len(parameters):
+            s.emit('(')
+            for parameter in parameters:
+                s.emit(parameter)
+                s.emit(',')
+            s.tosstoken()
+            s.emit(')')
+        s.emit('.')
 
-        # Last line should now be a '+'
-        s.tossline()
+        s.emit(actor_instance)
 
-        s.endBlock('function')
+        actor_entry = s.symbolTable['actors'][actor_id]
+        # print 'Actor entires' + str(actor_entry.keys())
+        if len(actor_entry['parameters']) > 0:
+            s.emit('(')
+            if len(assignments) > 0:
+                for assignment in assignments:
+                    s.emit(assignment.prop)
+                    s.emit('=')
+                    s.emit(assignment.val)
+                    s.emit(',')
+                s.tosstoken()
+            s.emit(')')
 
-    def emitFunctionBlock(s, actor, actor_id, function_id, block, guards = None):
+        s.newline()
+
+    def emitSum(s, sum_type, var, negations = []):
+        s.emit('sum')
+        s.emit(var)
+        s.emit(':')
+        s.emit(sum_type)
+        s.emit('.')
+        if len(negations):
+            s.emit('(')
+            for neg in negations:
+                s.emit(var)
+                s.emit('!=')
+                s.emit(neg)
+                s.emit('&&')
+            s.tosstoken()
+            s.emit(')')
+            s.emit('->')
+
+    def constructFunctionParameters(s, actor_id, actor_instance, guarded_actor_instance, function_id, assignments, parameters, function_parameters):
+        if len(parameters):
+            nextParam = parameters.pop(0)
+            if isinstance(nextParam, str): # Simple identifier
+                param = nextParam
+            elif nextParam.anyst: # Use a sum operator over the type
+                var = nextParam.type.lower() + '_' + str(len(parameters)) # Ensure unique naming
+                s.emitSum(nextParam.type, var)
+                param = var
+            elif nextParam.notst: # Use a sum operator over the type, excluding the not's parameters
+                var = nextParam.type.lower() + '_' + str(len(parameters)) # Ensure unique naming
+                s.emitSum(nextParam.type, var, nextParam.identifiers)
+                param = var
+
+            # More parameters to be appended
+            function_parameters.append(param)
+            s.constructFunctionParameters(actor_id, actor_instance, guarded_actor_instance, function_id, assignments, parameters, function_parameters)
+        else:
+            # All parameters are now in function_parameters
+            s.emitFunction(actor_id, actor_instance, guarded_actor_instance, function_id, assignments, function_parameters)
+
+    def emitFunctionBlocks(s, actor_id, actor_instance, function_id, blocks, guarded_actor_instance = None):
         s.startBlock('functionblock')
 
-        if block.ifelses:
-            for ifelse in block.ifelses:
-                if ifelse.ifst:
-                    s.emitIf(actor, actor_id, function_id, ifelse.ifst, ifelse.elseifst, ifelse.elsest, guards)
+        for block in blocks:
+            if block.ifelse:
 
-        if block.ifelses and block.functions:
+                ifelse = block.ifelse
+                if ifelse.ifst:
+                    s.emitIf(actor_id, actor_instance, function_id, ifelse.ifst, ifelse.elseifst, ifelse.elsest, guarded_actor_instance)
+
+            elif block.function:
+                s.constructFunctionParameters(actor_id, actor_instance, guarded_actor_instance, function_id, block.function.assignments, list(block.function.parameters), [])
+
             s.emit('+')
             s.newline()
 
-        if block.functions:
-            for function in block.functions:
-                s.emitFunction(actor, actor_id, function_id, function, guards)
-                s.emit('+')
-                s.newline()
-            s.tossline()
+        s.tossline()
 
         s.endBlock('functionblock')
 
-    def emitIf(s, actor, actor_id, function_id, ifst, elseifst, elsest, guards):
+    def emitIf(s, actor_id, actor_instance, function_id, ifst, elseifst, elsest, guarded_actor_instance):
         s.startBlock('if')
 
         s.emit('(')
@@ -426,7 +440,7 @@ class Mcrl2Generator:
         s.newline()
         s.indent()
 
-        s.emitFunctionBlock(actor, actor_id, function_id, ifst.function_block, guards)
+        s.emitFunctionBlocks(actor_id, actor_instance, function_id, ifst.function_blocks, guarded_actor_instance)
 
         s.unindent()
         s.emit(')')
@@ -434,32 +448,32 @@ class Mcrl2Generator:
 
         if elseifst and len(elseifst):
             stat = elseifst.pop(0)
-            s.emitElseIf(actor, actor_id, function_id, stat, elseifst, elsest, guards)
+            s.emitElseIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guards)
         elif elsest:
-            s.emitElse(actor, actor_id, function_id, elsest, guards)
+            s.emitElse(actor_instance, function_id, elsest, guards)
 
         s.endBlock('if')
 
-    def emitElseIf(s, actor, actor_id, function_id, stat, elseifst, elsest, guards):
+    def emitElseIf(s, actor_id, actor_instance, function_id, stat, elseifst, elsest, guards):
         s.startBlock('elseif')
 
         s.emit('<>', '(')
         s.newline()
         s.indent()
-        s.emitIf(actor, actor_id, function_id, stat, elseifst, elsest, guards)
+        s.emitIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guards)
         s.emit(')')
         s.unindent()
         s.newline()
 
         s.endBlock('elseif')
 
-    def emitElse(s, actor, actor_id, function_id, elsest, guards):
+    def emitElse(s, actor_id, actor_instance, function_id, elsest, guards):
         s.startBlock('else')
 
         s.emit('<>')
         s.indent()
         s.emit('(')
-        s.emitFunctionBlock(actor, actor_id, function_id, elsest.function_block, guards)
+        s.emitFunctionBlocks(actor_id, actor_instance, function_id, elsest.function_blocks, guarded_actor_instance)
         s.emit(')')
         s.unindent()
         s.newline()
@@ -486,32 +500,35 @@ class Mcrl2Generator:
                 s.emit('!')
             s.emit(comp.prop)
 
-    def emitGuards(s, actor, actor_id, guarded_actors):
+    def emitGuards(s, actor_id, actor_instance, guarded_actors):
         s.startBlock('guards')
 
         for guarded_actor in guarded_actors:
-            # TODO: Do this for each instance of a guarded actor!
-
-            guarded_actor_id = guarded_actor.actor
-            guarded_actor_entry = s.symbolTable['actors'][guarded_actor_id]
+            guarded_actor_instance = guarded_actor.actor
+            guarded_actor_entry = s.symbolTable['actors'][guarded_actor_instance]
 
             if 'instances' in guarded_actor_entry:
                 for instance in guarded_actor_entry['instances']:
-                    s.emitGuardedActor(actor, actor_id, guarded_actor, instance)
-                    s.emit('+')
-                    s.newline()
+                    if instance != actor_instance:
+                        s.emitGuardedActor(actor_id, actor_instance, guarded_actor, instance)
+                        s.emit('+')
+                        s.newline()
                 s.tossline()
             else:
-                s.emitGuardedActor(actor, actor_id, guarded_actor, guarded_actor_id)
+                s.emitGuardedActor(actor_id, actor_instance, guarded_actor, guarded_actor_instance)
+
+            s.emit('+')
+            s.newline()
+        s.tossline()
 
         s.endBlock('guards')
 
-    def emitGuardedActor(s, actor, actor_id, guarded_actor, guarded_actor_id):
+    def emitGuardedActor(s, actor_id, actor_instance, guarded_actor, guarded_actor_instance):
         s.startBlock('guardedActor')
 
         for guarded_function in guarded_actor.functions:
             guarding_function = guarded_function.function_identifier
-            s.emitFunctionBlock(actor, actor_id, guarding_function, guarded_function.function_block, guarded_actor_id)
+            s.emitFunctionBlocks(actor_id, actor_instance, guarding_function, guarded_function.function_blocks, guarded_actor_instance)
             s.emit('+')
             s.newline()
 

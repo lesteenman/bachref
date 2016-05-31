@@ -15,14 +15,14 @@ class Parser:
 	eq = Word('=')
 	string = Word('"') + alphanums + Word('"')
 
-	t_if = Word('if')
-	t_elseif = Word('elseif')
-	t_else = Word('else')
-	t_func = Word('->')
-	t_other = Word('Other')
-	t_any = Word('Any')
-	t_not = Word('Not')
-	t_struct = Word('struct')
+	t_if = Keyword('if')
+	t_elseif = Keyword('elseif')
+	t_else = Keyword('else')
+	t_func = Keyword('->')
+	# t_other = Keyword('Other')
+	t_any = Keyword('Any')
+	t_not = Keyword('Not')
+	t_struct = Keyword('struct')
 
 	t_and = Word('&&')
 	t_or = Word('||')
@@ -60,8 +60,8 @@ class Parser:
 			eq + \
 			value.setResultsName('val'))
 
-	parameter = Or([Group(t_identifier.setResultsName('identifier')), \
-			Group(t_other.setResultsName('otherst') + t_lbrace + t_identifier.setResultsName('type') + t_rbrace), \
+	parameter = Or([t_identifier.setResultsName('identifier'), \
+			# Group(t_other.setResultsName('otherst') + t_lbrace + t_identifier.setResultsName('type') + t_rbrace), \
 			Group(t_any.setResultsName('anyst') + t_lbrace + t_identifier.setResultsName('type') + t_rbrace), \
 			Group(t_not.setResultsName('notst') + t_lbrace + t_identifier.setResultsName('type') + t_col + Group( \
 				Optional(delimitedList(t_identifier)) \
@@ -88,19 +88,19 @@ class Parser:
 
 	ifelse = Group( \
 			Group(t_if - t_lbrace - condition - t_rbrace - function_block).setResultsName('ifst') - \
-			Group(ZeroOrMore(Group(t_elseif + t_lbrace - condition - t_rbrace - function_block))).setResultsName('elseifst') + \
+			Group(ZeroOrMore(Group(t_elseif - t_lbrace - condition - t_rbrace - function_block))).setResultsName('elseifst') + \
 			Group(Optional(t_else - function_block)).setResultsName('elsest') \
 		).setResultsName('ifelse')
 
 	function_block << t_lbrack - Group(ZeroOrMore(Or([ \
-		Group(ifelse).setResultsName('ifelses'), Group(function).setResultsName('functions') \
-	]))).setResultsName('function_block') - t_rbrack
+		Group(ifelse).setResultsName('ifelse'), Group(function).setResultsName('function') \
+	]))).setResultsName('function_blocks') - t_rbrack
 
 	action = Group(
 			t_identifier.setResultsName('identifier') - \
 			t_lbrace - Group(Optional(delimitedList(t_type))).setResultsName('parameter_types') - t_rbrace - \
 			t_col - \
-			OneOrMore(function_block))
+			function_block)
 
         instance = Group( t_identifier.setResultsName('identifier') + t_col + t_lbrack + \
             Group(OneOrMore(assignment)).setResultsName('assignments') + \

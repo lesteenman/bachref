@@ -1,12 +1,12 @@
 sorts: {
 	Segment: struct(station, lift, main, braking, repair)
 	Cart_Id: struct(cart1, cart2)
+	SwitchPos: struct(up, down)
 }
 
 actors: {
 	cart: {
 		states: {
-			id: Cart_Id
 			pos: Segment
 			open: Bool
 			locked: Bool
@@ -14,13 +14,11 @@ actors: {
 
 		instances: {
 			cart1: {
-				id = cart1
 				pos = braking
 				open = false
 				locked = false
 			}
 			cart2: {
-				id = cart2
 				pos = repair
 				open = false
 				locked = false
@@ -28,43 +26,37 @@ actors: {
 		}
 
 		actions: {
-			forward(Cart_Id, Segment, Segment): {
-				if (open == true) {
-					if (pos == station) {
-						-> id, station, lift {
-							pos = lift
-						}
+			forward(Segment, Segment): {
+				if (open == false) {
+					-> pos, lift {
+						pos = lift
 					}
-					elseif (pos == lift) {
-						-> id, lift, main {
-							pos = main
-						}
+					-> pos, main {
+						pos = main
 					}
-					elseif (pos == main) {
-						-> id, main, braking {
-							pos = braking
-						}
+					-> pos, braking {
+						pos = braking
 					}
-					else {
-						-> id, braking, station {
-							pos = station
-							locked = false
-						}
+					-> pos, station {
+						pos = station
 					}
-				}
-			}
-
-			backward(Cart_Id, Segment, Segment): {
-				if (open == false && pos == station) {
-					-> id, station, repair {
+					-> pos, repair {
 						pos = repair
 					}
 				}
 			}
 
-			open_braces(): {
+			backward(Segment, Segment): {
+				if (open == false && pos == station) {
+					-> station, repair {
+						pos = repair
+					}
+				}
+			}
+
+			open_braces(Segment): {
 				if (open == false && locked == false) {
-					-> id {
+					-> pos {
 						open = true
 					}
 				}
@@ -72,38 +64,103 @@ actors: {
 
 			close_braces(): {
 				if (open == true) {
-					-> id {
+					-> {
 						open = false
 						locked = true
 					}
 				}
 			}
 		}
+
+		guards: {
+			cart: {
+				forward: {
+					if (pos == station) {
+						-> Any(Segment), Not(Segment: station) {}
+					}
+					if (pos == lift) {
+						-> Any(Segment), Not(Segment: lift) {}
+					}
+					if (pos == main) {
+						-> Any(Segment), Not(Segment: lift, main) {}
+					}
+					if (pos == braking) {
+						-> Any(Segment), Not(Segment: main) {}
+					}
+					if (pos == repair) {
+						-> Any(Segment), Any(Segment) {}
+					}
+				}
+
+				backward: {
+					-> Any(Segment), Not(Segment: pos) {}
+				}
+			}
+		}
 	}
 
 	track: {
+		guards: {
+			cart: {
+				forward: {
+					-> station, lift {}
+					-> lift, main {}
+					-> main, braking {}
+					-> braking, station {}
+					-> repair, station {}
+				}
+
+				backward: {
+					-> station, repair {}
+				}
+
+				open_braces: {
+					-> station {}
+				}
+			}
+		}
+	}
+
+	switch: {
 		states: {
-			c1: Segment
-			c2: Segment
+			pos: SwitchPos
 		}
 
 		instances: {
-			c1 = braking
-			c2 = repair
+			pos = down
+		}
+
+		actions: {
+			up(): {
+				if (pos == down) {
+					-> { pos = up }
+				}
+			}
+			down(): {
+				if (pos == up) {
+					-> { pos = down }
+				}
+			}
 		}
 
 		guards: {
 			cart: {
 				forward: {
-					-> Any(Cart_Id), station, lift {}
-					-> Any(Cart_Id), lift, main {}
-					-> Any(Cart_Id), main, braking {}
-					-> Any(Cart_Id), braking, station {}
-					-> Any(Cart_Id), repair, station {}
+					-> Any(Segment), Not(Segment: station) {}
+					if (pos == up) {
+						-> repair, station {}
+					}
+					if (pos == down) {
+						-> braking, station {}
+					}
 				}
-				
+
 				backward: {
-					-> Any(Cart_Id), station, repair {}
+					-> Any(Segment), Not(Segment: braking, repair) {}
+					if (pos == up) {
+						-> station, braking {}
+						-> station, repair {}
+					}
 				}
 			}
 		}
@@ -132,23 +189,23 @@ actors: {
 			cart: {
 				open_braces: {
 					if (open == false) {
-						-> Any(Cart_Id) {
-							open = false
+						-> Any(Segment) {
+							open = true
 						}
 					}
 				}
 
 				close_braces: {
 					if (open == false) {
-						-> Any(Cart_Id) {}
+						-> {}
 					}
 				}
 
 				forward: {
 					if (open == false) {
-						-> Any(Cart_Id), station, Any(Segment) {}
+						-> station, Any(Segment) {}
 					}
-					-> Any(Cart_Id), Not(Segment: station), Any(Segment) {}
+					-> Not(Segment: station), Any(Segment) {}
 				}
 			}
 
@@ -184,6 +241,24 @@ actors: {
 				if (open == true) {
 					-> {
 						open = false
+					}
+				}
+			}
+		}
+
+		guards: {
+			cart: {
+				forward: {
+					-> Not(Segment: station), Any(Segment) {}
+					if (open == false) {
+						-> station, Any(Segment) {}
+					}
+				}
+
+				backward: {
+					-> Not(Segment: station), Any(Segment) {}
+					if (open == false) {
+						-> station, Any(Segment) {}
 					}
 				}
 			}

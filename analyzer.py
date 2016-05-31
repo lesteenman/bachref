@@ -38,8 +38,8 @@ class Analyzer:
 
     def analyze(self):
         self.buildSortsTable()
-        self.buildActionTable()
         self.buildActorsTable()
+        self.buildActionTable()
 
         if len(self.parseErrors):
             print 'Errors occured during parsing:'
@@ -96,12 +96,22 @@ class Analyzer:
             for guarded_actor in actor.guarded_actors:
                 for function in guarded_actor.functions:
                     action_label = guarded_actor.actor + '_' + function.function_identifier
+
+                    # Error: Undefined function being guarded
                     if action_label not in self.symbolTable['actions']:
                         self.parseError('Error: trying to guard an undefined function ' + \
                                 str(function.function_identifier) + \
                                 ' for actor ' + str(guarded_actor.actor) + \
                                 ', by actor ' + str(actor.identifier))
                     
+                    # Error: Trying to guard itself without other instances being available
+                    if actor.identifier == guarded_actor.actor:
+                        # Check if there are other instances of this actor
+                        entry = self.symbolTable['actors'][actor.identifier]
+                        if len(entry['instances']) <= 1:
+                            self.parseError('Error: The only available instance to guard of actor ' + \
+                                str(actor.identifier) + ' at function ' + str(action_label) + ' is the instance itself.')
+
                     self.symbolTable['actions'][action_label]['guards'].append(actor.identifier)
 
     def buildActorsTable(self):

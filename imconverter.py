@@ -16,7 +16,7 @@ with open("example.im", 'r') as f:
         if correct:
             generator = Mcrl2Generator(parser.im, analyzer.symbolTable)
             mcrl2 = generator.toMcrl2()
-            with open("example.mcrl2", 'w') as out:
+            with open("mcrl2/example.mcrl2", 'w') as out:
                 out.write(mcrl2)
                 print 'Written!'
 
@@ -28,7 +28,7 @@ with open("example.im", 'r') as f:
 # exit()
 
 print 'Advanced Example...'
-with open("example_rollercoaster.im", 'r') as f:
+with open("rollercoaster.im", 'r') as f:
 	example = f.read()
 	parser = Parser(example)
 	parser.parse()
@@ -39,7 +39,7 @@ with open("example_rollercoaster.im", 'r') as f:
         if correct:
             generator = Mcrl2Generator(parser.im, analyzer.symbolTable)
             mcrl2 = generator.toMcrl2()
-            with open("example_rollercoaster.mcrl2", 'w') as out:
+            with open("mcrl2/rollercoaster.mcrl2", 'w') as out:
                 out.write(mcrl2)
                 print 'Written!'
 
@@ -50,4 +50,4 @@ with open("example_rollercoaster.im", 'r') as f:
                 #     if lts:
                 #         helper.graph(lts)
 
-print 'Now testing with MCRL2 toolchain...'
+# print 'Now testing with MCRL2 toolchain...'
