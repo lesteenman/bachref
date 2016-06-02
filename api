@@ -93,9 +93,9 @@ ifelse:
 condition:
 	comp
 	OR
-	comp && conditional
+	comp && condition
 	OR
-	comp || conditional
+	comp || condition
 
 comp:
 	prop == val

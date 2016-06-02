@@ -1,46 +1,70 @@
 #!/bin/bash
 
-echo "Compiling examples:"
-./imconvert.py
+echo "Compiling examples to MCRL2:"
+python im2mcrl2.py
 
+if [ $? -ne 0 ]; then
+	echo "Compilation failed."
+	exit 1
+fi
+
+
+echo ""
+echo ""
 
 echo "Validating example:"
+error=0
 
-pushd mcrl2
-result="$(mcrl22lps example.mcrl2)"
+cd example
+
+result="$(mcrl22lps --lin-method=stack -q example.mcrl2)"
 if [ ! -z "$result" ]; then
-
 	echo "Success!"
-	# echo "Showing graph:"
-
-# 	mcrl22lps example.mcrl2 example.lps
-# 	lps2lts example.lps example.lts
-# 	ltsgraph example.lts
 else
 	echo "Error while parsing!"
+	error=1
+fi
+
+cd ..
+echo ""
+echo ""
+
+
+
+echo "Validating rollercoaster:"
+
+cd rollercoaster
+
+result="$(mcrl22lps --lin-method=stack -q rollercoaster.mcrl2)"
+if [ ! -z "$result" ]; then
+	echo "Success!"
+else
+	echo "Error while parsing!"
+	error=1
 fi
 
 
+cd ..
 echo ""
 echo ""
-echo ""
-echo ""
 
 
-
-echo "Validating rollercoaster example:"
-
-result="$(mcrl22lps example_rollercoaster.mcrl2)"
-if [ ! -z "$result" ]; then
-
-	echo "Success!"
-
-	echo "Showing graph"
-
-	mcrl22lps example_rollercoaster.mcrl2 example_rollercoaster.lps
-	lps2lts example_rollercoaster.lps example_rollercoaster.lts
-	ltsgraph example_rollercoaster.lts
-
-else
-	echo "Error while parsing!"
+if [ $error -eq 1 ]; then
+	exit 1
 fi
+
+
+
+echo "Compiling examples to Java:"
+
+python im2java.py
+
+if [ $? -ne 0 ]; then
+	echo "Compilation failed."
+	exit 1
+fi
+
+
+
+echo "Attempting to compile example:"
+javac models/*.java

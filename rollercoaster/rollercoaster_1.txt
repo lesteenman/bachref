@@ -1,0 +1,126 @@
+sort Segment = struct station | lift | main | braking | repair;
+     Cart_Id = struct cart1 | cart2;
+     SwitchPos = struct up | down;
+     Enum1 = struct e0_1;
+     Stack = struct push(getstate: Pos, pop: Stack) | emptystack?isempty;
+     Enum5 = struct e4_5 | e3_5 | e2_5 | e1_5 | e0_5;
+     Stack1 = struct push1(getstate1: Pos, getopen: Bool, pop1: Stack1) | emptystack1?isempty1;
+     Stack2 = struct push2(getstate2: Pos, getpos1: SwitchPos, pop2: Stack2) | emptystack2?isempty2;
+     Enum3 = struct e2_3 | e1_3 | e0_3;
+     Stack3 = struct push3(getstate3: Pos, getopen1: Bool, pop3: Stack3) | emptystack3?isempty3;
+     Stack4 = struct push4(getstate4: Pos, getpos: Segment, getopen2: Bool, getlocked: Bool, pop4: Stack4) | emptystack4?isempty4;
+     Stack5 = struct push5(getstate5: Pos, getpos2: Segment, getopen3: Bool, getlocked1: Bool, pop5: Stack5) | emptystack5?isempty5;
+
+map  C5_: Enum5 # Segment # Segment # Segment # Segment # Segment -> Segment;
+     C5_1: Enum5 # Stack # Stack # Stack # Stack # Stack -> Stack;
+     C5_2: Enum5 # Bool # Bool # Bool # Bool # Bool -> Bool;
+     C3_: Enum3 # Segment # Segment # Segment -> Segment;
+     C3_1: Enum3 # Stack2 # Stack2 # Stack2 -> Stack2;
+     C3_2: Enum3 # Bool # Bool # Bool -> Bool;
+     C5_3: Enum5 # Stack4 # Stack4 # Stack4 # Stack4 # Stack4 -> Stack4;
+     C5_4: Enum5 # Stack5 # Stack5 # Stack5 # Stack5 # Stack5 -> Stack5;
+
+var  x1,y5,y4,y3,y2,y1,x4,y18,y17,y16: Segment;
+     e1,e2,e3,e19,e22: Enum5;
+     x2,y10,y9,y8,y7,y6: Stack;
+     x3,y15,y14,y13,y12,y11,x6,y24,y23,y22: Bool;
+     e10,e11,e12: Enum3;
+     x5,y21,y20,y19: Stack2;
+     x7,y29,y28,y27,y26,y25: Stack4;
+     x8,y34,y33,y32,y31,y30: Stack5;
+eqn  C5_(e1, x1, x1, x1, x1, x1)  =  x1;
+     C5_(e4_5, y5, y4, y3, y2, y1)  =  y5;
+     C5_(e3_5, y5, y4, y3, y2, y1)  =  y4;
+     C5_(e2_5, y5, y4, y3, y2, y1)  =  y3;
+     C5_(e1_5, y5, y4, y3, y2, y1)  =  y2;
+     C5_(e0_5, y5, y4, y3, y2, y1)  =  y1;
+     C5_1(e2, x2, x2, x2, x2, x2)  =  x2;
+     C5_1(e4_5, y10, y9, y8, y7, y6)  =  y10;
+     C5_1(e3_5, y10, y9, y8, y7, y6)  =  y9;
+     C5_1(e2_5, y10, y9, y8, y7, y6)  =  y8;
+     C5_1(e1_5, y10, y9, y8, y7, y6)  =  y7;
+     C5_1(e0_5, y10, y9, y8, y7, y6)  =  y6;
+     C5_2(e3, x3, x3, x3, x3, x3)  =  x3;
+     C5_2(e4_5, y15, y14, y13, y12, y11)  =  y15;
+     C5_2(e3_5, y15, y14, y13, y12, y11)  =  y14;
+     C5_2(e2_5, y15, y14, y13, y12, y11)  =  y13;
+     C5_2(e1_5, y15, y14, y13, y12, y11)  =  y12;
+     C5_2(e0_5, y15, y14, y13, y12, y11)  =  y11;
+     C3_(e10, x4, x4, x4)  =  x4;
+     C3_(e2_3, y18, y17, y16)  =  y18;
+     C3_(e1_3, y18, y17, y16)  =  y17;
+     C3_(e0_3, y18, y17, y16)  =  y16;
+     C3_1(e11, x5, x5, x5)  =  x5;
+     C3_1(e2_3, y21, y20, y19)  =  y21;
+     C3_1(e1_3, y21, y20, y19)  =  y20;
+     C3_1(e0_3, y21, y20, y19)  =  y19;
+     C3_2(e12, x6, x6, x6)  =  x6;
+     C3_2(e2_3, y24, y23, y22)  =  y24;
+     C3_2(e1_3, y24, y23, y22)  =  y23;
+     C3_2(e0_3, y24, y23, y22)  =  y22;
+     C5_3(e19, x7, x7, x7, x7, x7)  =  x7;
+     C5_3(e4_5, y29, y28, y27, y26, y25)  =  y29;
+     C5_3(e3_5, y29, y28, y27, y26, y25)  =  y28;
+     C5_3(e2_5, y29, y28, y27, y26, y25)  =  y27;
+     C5_3(e1_5, y29, y28, y27, y26, y25)  =  y26;
+     C5_3(e0_5, y29, y28, y27, y26, y25)  =  y25;
+     C5_4(e22, x8, x8, x8, x8, x8)  =  x8;
+     C5_4(e4_5, y34, y33, y32, y31, y30)  =  y34;
+     C5_4(e3_5, y34, y33, y32, y31, y30)  =  y33;
+     C5_4(e2_5, y34, y33, y32, y31, y30)  =  y32;
+     C5_4(e1_5, y34, y33, y32, y31, y30)  =  y31;
+     C5_4(e0_5, y34, y33, y32, y31, y30)  =  y30;
+
+act  button_push_button,switch_down,gate_open,perform_gate_open,button_allows_gate_open,switch_up;
+     cart2_backward,perform_cart2_backward,cart2_allows_cart2_backward,cart1_allows_cart2_backward,track_allows_cart2_backward,switch_allows_cart2_backward,gate_allows_cart2_backward,cart1_backward,perform_cart1_backward,cart2_allows_cart1_backward,cart1_allows_cart1_backward,track_allows_cart1_backward,switch_allows_cart1_backward,gate_allows_cart1_backward,cart2_forward,perform_cart2_forward,cart2_allows_cart2_forward,cart1_allows_cart2_forward,track_allows_cart2_forward,switch_allows_cart2_forward,button_allows_cart2_forward,gate_allows_cart2_forward,cart1_forward,perform_cart1_forward,cart2_allows_cart1_forward,cart1_allows_cart1_forward,track_allows_cart1_forward,switch_allows_cart1_forward,button_allows_cart1_forward,gate_allows_cart1_forward: Segment # Segment;
+     cart2_close_braces,perform_cart2_close_braces,button_allows_cart2_close_braces,cart1_close_braces,perform_cart1_close_braces,button_allows_cart1_close_braces;
+     cart2_open_braces,perform_cart2_open_braces,track_allows_cart2_open_braces,button_allows_cart2_open_braces,cart1_open_braces,perform_cart1_open_braces,track_allows_cart1_open_braces,button_allows_cart1_open_braces: Segment;
+     gate_close;
+
+proc P(s3_track: Stack, s1_gate3: Stack1, s2_switch3: Stack2, s4_button3: Stack3, s5_cart10: Stack4, s6_cart19: Stack5) =
+       (getstate1(s1_gate3) == 1 && getopen(s1_gate3)) ->
+         gate_close .
+         P(s1_gate3 = push1(1, false, emptystack1))
+     + (getpos1(s2_switch3) == up && getstate2(s2_switch3) == 1) ->
+         switch_down .
+         P(s2_switch3 = push2(1, down, emptystack2))
+     + (getpos1(s2_switch3) == down && getstate2(s2_switch3) == 1) ->
+         switch_up .
+         P(s2_switch3 = push2(1, up, emptystack2))
+     + (getstate3(s4_button3) == 1 && getopen1(s4_button3)) ->
+         button_push_button .
+         P(s4_button3 = push3(1, false, emptystack3))
+     + (getstate3(s4_button3) == 1 && !getopen1(s4_button3) && getstate5(s6_cart19) == 1 && getopen3(s6_cart19)) ->
+         perform_cart1_close_braces .
+         P(s4_button3 = push3(1, getopen1(s4_button3), emptystack3), s6_cart19 = push5(1, getpos2(s6_cart19), false, true, emptystack5))
+     + (getstate3(s4_button3) == 1 && getopen2(s5_cart10) && !getopen1(s4_button3) && getstate4(s5_cart10) == 1) ->
+         perform_cart2_close_braces .
+         P(s4_button3 = push3(1, getopen1(s4_button3), emptystack3), s5_cart10 = push4(1, getpos(s5_cart10), false, true, emptystack4))
+     + (getstate3(s4_button3) == 1 && getstate1(s1_gate3) == 1 && !getopen(s1_gate3) && getopen1(s4_button3)) ->
+         perform_gate_open .
+         P(s1_gate3 = push1(1, true, emptystack1), s4_button3 = push3(1, getopen1(s4_button3), emptystack3))
+     + (getstate3(s4_button3) == 1 && getstate(s3_track) == 1 && station == getpos2(s6_cart19) && !getopen1(s4_button3) && getstate5(s6_cart19) == 1 && !getlocked1(s6_cart19) && !getopen3(s6_cart19)) ->
+         perform_cart1_open_braces(station) .
+         P(s3_track = push(1, emptystack), s4_button3 = push3(1, true, emptystack3), s6_cart19 = push5(1, getpos2(s6_cart19), true, getlocked1(s6_cart19), emptystack5))
+     + sum segment_0_gate2,segment_1_gate2: Segment,e8_gate3: Bool,segment_0_switch2,segment_1_switch2: Segment,e15_switch3: Enum3.
+         (C3_2(e15_switch3, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && !(segment_0_switch2 == braking) && !(segment_0_switch2 == repair)) && C3_2(e15_switch3, segment_0_switch2 == station && segment_1_switch2 == station, segment_0_switch2 == station && segment_1_switch2 == station, true) && if(e8_gate3, getstate1(s1_gate3) == 1 && !getopen(s1_gate3), getstate1(s1_gate3) == 1 && !(segment_1_gate2 == station)) && if(e8_gate3, segment_0_gate2 == station, true) && getstate(s3_track) == 1 && station == C3_(e15_switch3, station, station, segment_1_switch2) && repair == C3_(e15_switch3, repair, braking, segment_0_switch2) && station == if(e8_gate3, station, segment_1_gate2) && repair == if(e8_gate3, segment_1_gate2, segment_0_gate2) && !(repair == getpos(s5_cart10)) && getpos2(s6_cart19) == station && getstate5(s6_cart19) == 1 && getstate4(s5_cart10) == 1 && !getopen3(s6_cart19)) ->
+         perform_cart1_backward(station, repair) .
+         P(s3_track = push(1, emptystack), s1_gate3 = push1(1, getopen(s1_gate3), emptystack1), s2_switch3 = push2(1, getpos1(s2_switch3), emptystack2), s5_cart10 = push4(1, getpos(s5_cart10), getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), s6_cart19 = push5(1, repair, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5))
+     + (getstate3(s4_button3) == 1 && getstate(s3_track) == 1 && station == getpos(s5_cart10) && !getlocked(s5_cart10) && !getopen2(s5_cart10) && !getopen1(s4_button3) && getstate4(s5_cart10) == 1) ->
+         perform_cart2_open_braces(station) .
+         P(s3_track = push(1, emptystack), s4_button3 = push3(1, true, emptystack3), s5_cart10 = push4(1, getpos(s5_cart10), true, getlocked(s5_cart10), emptystack4))
+     + sum segment_0_gate,segment_1_gate: Segment,e6_gate3: Bool,segment_0_switch,segment_1_switch: Segment,e13_switch3: Enum3.
+         (C3_2(e13_switch3, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && !(segment_0_switch == braking) && !(segment_0_switch == repair)) && C3_2(e13_switch3, segment_0_switch == station && segment_1_switch == station, segment_0_switch == station && segment_1_switch == station, true) && if(e6_gate3, getstate1(s1_gate3) == 1 && !getopen(s1_gate3), getstate1(s1_gate3) == 1 && !(segment_1_gate == station)) && if(e6_gate3, segment_0_gate == station, true) && getstate(s3_track) == 1 && C3_(e13_switch3, station, station, segment_1_switch) == if(e6_gate3, station, segment_1_gate) && C3_(e13_switch3, repair, braking, segment_0_switch) == if(e6_gate3, segment_1_gate, segment_0_gate) && C3_(e13_switch3, station, station, segment_1_switch) == station && C3_(e13_switch3, repair, braking, segment_0_switch) == repair && !getopen2(s5_cart10) && getstate5(s6_cart19) == 1 && getpos(s5_cart10) == station && getstate4(s5_cart10) == 1 && !(C3_(e13_switch3, repair, braking, segment_0_switch) == getpos2(s6_cart19))) ->
+         perform_cart2_backward(C3_(e13_switch3, station, station, segment_1_switch), C3_(e13_switch3, repair, braking, segment_0_switch)) .
+         P(s3_track = push(1, emptystack), s1_gate3 = push1(1, getopen(s1_gate3), emptystack1), s2_switch3 = push2(1, getpos1(s2_switch3), emptystack2), s5_cart10 = push4(1, repair, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), s6_cart19 = push5(1, getpos2(s6_cart19), getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5))
+     + sum segment_0_button1,segment__button3: Segment,e16_button3: Bool,segment_0_gate3,segment_1_gate3: Segment,e5_gate3: Bool,e_track: Enum5,segment_0_switch3,segment_1_switch3: Segment,e9_switch3: Enum3,e23_cart19,e18_cart10: Enum5.
+         (C3_2(e9_switch3, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == down, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && !(segment_0_switch3 == station)) && C3_2(e9_switch3, segment_0_switch3 == station && segment_1_switch3 == station, segment_0_switch3 == station && segment_1_switch3 == station, true) && if(e5_gate3, getstate1(s1_gate3) == 1 && !getopen(s1_gate3), getstate1(s1_gate3) == 1 && !(segment_1_gate3 == station)) && if(e5_gate3, segment_0_gate3 == station, true) && if(e16_button3, getstate3(s4_button3) == 1 && !(segment_0_button1 == station), getstate3(s4_button3) == 1 && !getopen1(s4_button3)) && if(e16_button3, true, segment__button3 == station) && C5_2(e23_cart19, getstate5(s6_cart19) == 1 && getpos2(s6_cart19) == repair, getstate5(s6_cart19) == 1 && !(if(e16_button3, segment__button3, segment_0_button1) == main) && getpos2(s6_cart19) == braking, getstate5(s6_cart19) == 1 && !(if(e16_button3, segment__button3, segment_0_button1) == lift) && !(if(e16_button3, segment__button3, segment_0_button1) == main) && getpos2(s6_cart19) == main, getstate5(s6_cart19) == 1 && !(if(e16_button3, segment__button3, segment_0_button1) == lift) && getpos2(s6_cart19) == lift, getstate5(s6_cart19) == 1 && !(if(e16_button3, segment__button3, segment_0_button1) == station) && getpos2(s6_cart19) == station) && getstate(s3_track) == 1 && if(e16_button3, segment_0_button1, station) == C5_(e_track, repair, braking, main, lift, station) && if(e16_button3, segment__button3, segment_0_button1) == C5_(e_track, station, station, braking, main, lift) && if(e16_button3, segment_0_button1, station) == C3_(e9_switch3, braking, repair, segment_1_switch3) && if(e16_button3, segment__button3, segment_0_button1) == C3_(e9_switch3, station, station, segment_0_switch3) && if(e16_button3, segment_0_button1, station) == if(e5_gate3, station, segment_1_gate3) && if(e16_button3, segment__button3, segment_0_button1) == if(e5_gate3, segment_1_gate3, segment_0_gate3) && if(e16_button3, segment_0_button1, station) == getpos(s5_cart10) && if(e16_button3, segment__button3, segment_0_button1) == C5_(e18_cart10, repair, station, braking, main, lift) && !getopen2(s5_cart10) && getstate4(s5_cart10) == 1) ->
+         perform_cart2_forward(if(e16_button3, segment_0_button1, station), if(e16_button3, segment__button3, segment_0_button1)) .
+         P(s3_track = push(1, emptystack), s1_gate3 = push1(1, getopen(s1_gate3), emptystack1), s2_switch3 = push2(1, getpos1(s2_switch3), emptystack2), s4_button3 = push3(1, getopen1(s4_button3), emptystack3), s5_cart10 = C5_3(e18_cart10, push4(1, repair, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), push4(1, station, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), push4(1, braking, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), push4(1, main, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), push4(1, lift, getopen2(s5_cart10), getlocked(s5_cart10), emptystack4)), s6_cart19 = push5(1, getpos2(s6_cart19), getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5))
+     + sum segment_0_button2,segment_2_button3: Segment,e17_button3: Bool,segment_0_gate1,segment_1_gate1: Segment,e7_gate3: Bool,e4_track: Enum5,segment_0_switch1,segment_1_switch1: Segment,e14_switch3: Enum3,e21_cart19,e20_cart10: Enum5.
+         (C3_2(e14_switch3, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == down, getstate2(s2_switch3) == 1 && getpos1(s2_switch3) == up, getstate2(s2_switch3) == 1 && !(segment_0_switch1 == station)) && C3_2(e14_switch3, segment_0_switch1 == station && segment_1_switch1 == station, segment_0_switch1 == station && segment_1_switch1 == station, true) && if(e7_gate3, getstate1(s1_gate3) == 1 && !getopen(s1_gate3), getstate1(s1_gate3) == 1 && !(segment_1_gate1 == station)) && if(e7_gate3, segment_0_gate1 == station, true) && if(e17_button3, getstate3(s4_button3) == 1 && !(segment_0_button2 == station), getstate3(s4_button3) == 1 && !getopen1(s4_button3)) && if(e17_button3, true, segment_2_button3 == station) && C5_2(e20_cart10, getstate4(s5_cart10) == 1 && getpos(s5_cart10) == repair, getstate4(s5_cart10) == 1 && !(if(e17_button3, segment_2_button3, segment_0_button2) == main) && getpos(s5_cart10) == braking, getstate4(s5_cart10) == 1 && !(if(e17_button3, segment_2_button3, segment_0_button2) == lift) && !(if(e17_button3, segment_2_button3, segment_0_button2) == main) && getpos(s5_cart10) == main, getstate4(s5_cart10) == 1 && !(if(e17_button3, segment_2_button3, segment_0_button2) == lift) && getpos(s5_cart10) == lift, getstate4(s5_cart10) == 1 && !(if(e17_button3, segment_2_button3, segment_0_button2) == station) && getpos(s5_cart10) == station) && getstate(s3_track) == 1 && if(e17_button3, segment_0_button2, station) == C5_(e4_track, repair, braking, main, lift, station) && if(e17_button3, segment_2_button3, segment_0_button2) == C5_(e4_track, station, station, braking, main, lift) && if(e17_button3, segment_0_button2, station) == C3_(e14_switch3, braking, repair, segment_1_switch1) && if(e17_button3, segment_2_button3, segment_0_button2) == C3_(e14_switch3, station, station, segment_0_switch1) && if(e17_button3, segment_0_button2, station) == if(e7_gate3, station, segment_1_gate1) && getstate5(s6_cart19) == 1 && if(e17_button3, segment_2_button3, segment_0_button2) == if(e7_gate3, segment_1_gate1, segment_0_gate1) && if(e17_button3, segment_0_button2, station) == getpos2(s6_cart19) && if(e17_button3, segment_2_button3, segment_0_button2) == C5_(e21_cart19, repair, station, braking, main, lift) && !getopen3(s6_cart19)) ->
+         perform_cart1_forward(if(e17_button3, segment_0_button2, station), if(e17_button3, segment_2_button3, segment_0_button2)) .
+         P(s3_track = push(1, emptystack), s1_gate3 = push1(1, getopen(s1_gate3), emptystack1), s2_switch3 = push2(1, getpos1(s2_switch3), emptystack2), s4_button3 = push3(1, getopen1(s4_button3), emptystack3), s5_cart10 = push4(1, getpos(s5_cart10), getopen2(s5_cart10), getlocked(s5_cart10), emptystack4), s6_cart19 = C5_4(e21_cart19, push5(1, repair, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5), push5(1, station, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5), push5(1, braking, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5), push5(1, main, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5), push5(1, lift, getopen3(s6_cart19), getlocked1(s6_cart19), emptystack5)))
+     + delta;
+
+init P(push(1, emptystack), push1(1, false, emptystack1), push2(1, down, emptystack2), push3(1, false, emptystack3), push4(1, repair, false, false, emptystack4), push5(1, braking, false, false, emptystack5));

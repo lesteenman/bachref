@@ -24,7 +24,7 @@ class Mcrl2Generator:
         self.mcrl2 = []
         self.line = deque([])
         self.errors = [];
-        self.nameGen = Names(symbolTable)
+        self.nameGen = Names(symbolTable, 'mcrl2')
 
     def toMcrl2(self):
         self.emitActionsList(self.symbolTable['actions'])
@@ -127,12 +127,7 @@ class Mcrl2Generator:
         for act, action in actions.iteritems():
             actor = s.symbolTable['actors'][action['actor']]
             for instance in actor['instances']:
-                action_label = instance + '_' + action['identifier']
-                if len(action['guards']) > 0:
-                    allow_label = 'perform_' + action_label
-                else:
-                    allow_label = action_label
-                s.emit(allow_label)
+                s.emit(s.nameGen.commLabel(instance, action['identifier']))
 
                 s.emit(',')
         s.tosstoken()
@@ -153,22 +148,10 @@ class Mcrl2Generator:
         for act, action in actions.iteritems():
             actor = s.symbolTable['actors'][action['actor']]
             for instance in actor['instances']:
-                action_label = instance + '_' + action['identifier']
                 if len(action['guards']) > 0:
-                    # In rare cases, the only guard will be the actor himself. Check for this.
-                    # if len(action['guards']) == 1:
-                    #     guard_actor = s.symbolTable['actors'][action['guards'][0]]
-                    #     guard_instances = guard_actor['instances']
-                    #     if len(guard_instances) == 1 and guard_instances.keys()[0] == instance:
-                    #         print 'Only guard is the actor himself, skipping! '
-                    #         print action_label
-                    #         print guard_instances
-                    #         continue
-
                     s.newline()
-                    allow_label = 'perform_' + action_label
 
-                    s.emit(action_label)
+                    s.emit(s.nameGen.actionLabel(instance, action['identifier']))
                     s.emit('|')
                     for guard in action['guards']:
                         guard_actor = s.symbolTable['actors'][guard]
@@ -176,12 +159,12 @@ class Mcrl2Generator:
                             if guard_instance == instance:
                                 continue
 
-                            guard_label = guard_instance + '_allows_' + action_label
-                            s.emit(guard_label)
+                            s.emit(s.nameGen.guardLabel(guard_instance, instance, action['identifier']))
                             s.emit('|')
                     s.tosstoken()
                     s.emit('->')
-                    s.emit(allow_label)
+
+                    s.emit(s.nameGen.commLabel(instance, action['identifier']))
                     s.emit(',')
 
         s.tosstoken()
@@ -222,28 +205,26 @@ class Mcrl2Generator:
         s.newline()
         s.indent()
 
-        for act, details in actions.iteritems():
-            actor = s.symbolTable['actors'][details['actor']]
-            guards = details['guards']
+        for action_id, action in actions.iteritems():
+            actor = s.symbolTable['actors'][action['actor']]
+            guards = action['guards']
 
             for instance in actor['instances']:
-                action = instance + '_' + details['identifier']
-
-                s.emit(action)
+                s.emit(s.nameGen.actionLabel(instance, action['identifier']))
                 s.emit(',')
                 if len(guards) > 0:
-                    s.emit('perform_' + action)
+                    s.emit(s.nameGen.commLabel(instance, action['identifier']))
                     s.emit(',')
                     for guard in guards:
                         guard_actor = s.symbolTable['actors'][guard]
                         for guard_instance in guard_actor['instances']:
-                            s.emit(guard_instance + '_allows_' + action)
+                            s.emit(s.nameGen.guardLabel(guard_instance, instance, action['identifier']))
                             s.emit(',')
 
                 s.tosstoken()
                 
                 s.emit(':')
-                for parameter in details['parameters']:
+                for parameter in action['parameters']:
                     s.emit(parameter)
                     s.emit('#')
                 s.tosstoken()
@@ -336,15 +317,12 @@ class Mcrl2Generator:
                 s.emit('+')
                 s.newline()
             s.tossline(1)
-                    
 
     def emitFunction(s, actor_id, actor_instance, guarded_actor_instance, function_id, assignments, parameters):
         if guarded_actor_instance:
-            action_label = actor_instance + '_allows_' + guarded_actor_instance + '_' + function_id
+            s.emit(s.nameGen.guardLabel(actor_instance, guarded_actor_instance, function_id))
         else:
-            action_label = actor_instance + '_' + function_id
-
-        s.emit(action_label)
+            s.emit(s.nameGen.actionLabel(actor_instance, function_id))
 
         if len(parameters):
             s.emit('(')
