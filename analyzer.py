@@ -121,12 +121,16 @@ class Analyzer:
             if actor.identifier in actors:
                 self.parseError('Duplicate actor identifier: ' + str(actor.identifier))
 
-            parameters = {}
+            parameters = []
             numparams = 0
             if actor.states:
                 for state in actor.states:
                     numparams += 1
-                    parameters[state.identifier] = state.type
+                    parameter = {
+                        'identifier': state.identifier,
+                        'type': state.type
+                    }
+                    parameters.append(parameter)
 
             instances = {}
             if actor.instances:

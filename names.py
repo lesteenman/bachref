@@ -8,6 +8,12 @@ class Names:
     def guardLabel(self, guarding_actor_id, guarded_actor_id, action_id):
         if self.style == 'mcrl2':
             return guarding_actor_id + '_allows_' + guarded_actor_id + '_' + action_id
+        else:
+            label = 'allows_' + guarded_actor_id + '_' + action_id
+            if guarding_actor_id:
+                label = guarding_actor_id + '_' + label
+            label = self.camelcase(label, True)
+            return label[0].lower() + label[1:]
 
     def actionLabel(self, instance_id, action_id):
         if self.style == 'mcrl2':
@@ -51,10 +57,13 @@ class Names:
 
         return None
 
-    def camelcase(self, string):
+    def camelcase(self, string, lcFirst=False):
         camelCased = ''
         parts = string.split('_')
         for part in parts:
             camelCased += part[0].upper() + part[1:]
 
-        return camelCased
+        if lcFirst:
+            return camelCased[0].lower() + camelCased[1:]
+        else:
+            return camelCased

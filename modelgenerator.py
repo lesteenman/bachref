@@ -4,7 +4,6 @@ from pprint import *
 from javafileemitter import JavaFileEmitter
 
 class ModelGenerator(JavaFileEmitter):
-
     def __init__(self, model, symbolTable, package, actor_id):
         super(ModelGenerator, self).__init__(model, symbolTable, package)
         self.actor_id = actor_id
@@ -33,11 +32,7 @@ class ModelGenerator(JavaFileEmitter):
 
         s.emitActions()
 
-        for guarded_actor in s.actor.guarded_actors:
-            pass
-            # guarded_actor_entry = s.symbolTable['actors'][guarded_actor]
-            # for instance in guarded_actor_entry['instances']:
-            #     s.emitGuard(guarded_actor, instance)
+        s.emitGuards()
 
         s.closeClass()
 
@@ -58,16 +53,47 @@ class ModelGenerator(JavaFileEmitter):
 
     def emitConstructor(s):
         params = []
-        for state in s.actor.states:
-            t = state.type
+        for state in s.actor_data['parameters']:
+            t = state['type']
             if t == 'Bool':
                 t = 'boolean'
             if t == 'Nat':
                 t = 'integer'
 
-            params.append(t + ' ' + state.identifier)
+            params.append(t + ' ' + state['identifier'])
 
-        s.emitFunctionBlock(params=params, func=s.constructor)
+        s.emitFunctionBlock(params=params, name=s.className, func=s.constructor)
+
+    def emitActions(s):
+        for action in s.actor.actions:
+            s.emitAction(action)
+            s.newline()
+
+    def emitGuards(s):
+        for guarded_actor in s.actor.guarded_actors:
+            guarded_actor_entry = s.symbolTable['actors'][guarded_actor.actor]
+            for guarded_instance in guarded_actor_entry['instances']:
+                for guarded_function in guarded_actor.functions:
+                    guarded_function_entry = s.symbolTable['actions'][guarded_actor.actor + '_' + guarded_function.function_identifier]
+                    guard_label = s.namegen.guardLabel(None, guarded_instance, guarded_function.function_identifier)
+
+                    parameters = []
+                    action_parameters = []
+                    i = 0
+                    for param in guarded_function_entry['parameters']:
+                        i += 1
+                        parameters.append(param + ' ' + param.lower() + str(i))
+                        action_parameters.append(param.lower() + str(i))
+
+                    funcparams = [guarded_function, action_parameters]
+                    s.emitFunctionBlock(name=guard_label, func=s.guard, funcparams=funcparams, params=parameters)
+
+    def guard(s, guarded_function, action_params):
+        inner_function = s.returnTrue
+        s.action(None, guarded_function.function_blocks, action_params, inner_function)
+
+        s.emit('return', 'false', ';')
+        s.newline()
 
     def constructor(s):
         for state in s.actor.states:
@@ -79,11 +105,6 @@ class ModelGenerator(JavaFileEmitter):
 
         s.newline()
 
-    def emitActions(s):
-        for action in s.actor.actions:
-            s.emitAction(action)
-            s.newline()
-
     def emitAction(s, action):
         params = []
         i = 0
@@ -92,25 +113,27 @@ class ModelGenerator(JavaFileEmitter):
             name = param.lower() + '_' + str(i)
             params.append(name)
 
-        funcparams = [action.identifier, action.function_blocks, params]
+        inner_function = s.assignments
+
+        funcparams = [action.identifier, action.function_blocks, params, inner_function]
         s.emitFunctionBlock(returntype='boolean', public=True, func=s.action, funcparams=funcparams, params=params, name=action.identifier)
 
-    def action(s, action_label, function_blocks, action_params):
+    def action(s, action_label, function_blocks, action_params, inner_function):
         for function_block in function_blocks:
             if function_block.ifelse:
-                s.emitElseIf(action_label, function_block.ifelse, action_params)
+                s.emitElseIf(action_label, function_block.ifelse, action_params, inner_function)
 
             elif function_block.function:
-                s.emitFunction(action_label, function_block.function, action_params)
+                s.emitFunction(action_label, function_block.function, action_params, inner_function)
 
-    def emitElseIf(s, action_label, elseif, action_params):
+    def emitElseIf(s, action_label, elseif, action_params, inner_function):
         ifst = elseif.ifst
         s.emit('if', '(')
         s.emitCondition(ifst.condition)
         s.emit(')', '{')
         s.newline()
         s.indent()
-        s.action(action_label, elseif.ifst.function_blocks, action_params)
+        s.action(action_label, elseif.ifst.function_blocks, action_params, inner_function)
         s.unindent()
         s.emit('}')
         s.newline()
@@ -126,7 +149,7 @@ class ModelGenerator(JavaFileEmitter):
                 s.newline()
                 s.indent()
 
-                s.action(action_label, elseifst.function_blocks, action_params)
+                s.action(action_label, elseifst.function_blocks, action_params, inner_function)
 
                 s.unindent()
                 s.emit('}')
@@ -136,7 +159,7 @@ class ModelGenerator(JavaFileEmitter):
             s.emit('else', '{')
             s.newline()
             s.indent()
-            s.action(action_label, elseif.elsest.function_blocks, action_params)
+            s.action(action_label, elseif.elsest.function_blocks, action_params, inner_function)
             s.unindent()
             s.emit('}')
             s.newline()
@@ -155,11 +178,17 @@ class ModelGenerator(JavaFileEmitter):
         s.emit(comp.comparator)
         s.emit(comp.val)
 
-    def emitFunction(s, action_label, function, action_params):
+    def emitFunction(s, action_label, function, action_params, inner_function):
         if len(action_params):
             s.emit('if', '(')
             for param_name, param in zip(action_params, function.parameters):
-                s.emit(param_name, '==', str(param))
+                if type(param) == str:
+                    s.emit(param_name, '==', str(param))
+                elif param.anyst:
+                    s.emitAnyOrNot(param_name, param.type, [])
+                elif param.notst:
+                    s.emitAnyOrNot(param_name, param.type, param.vals)
+
                 s.emit('&&')
 
             s.tosstoken()
@@ -168,9 +197,7 @@ class ModelGenerator(JavaFileEmitter):
             s.newline()
             s.indent()
 
-        for ass in function.assignments:
-            s.emit('self.' + ass.prop, '=', ass.val, ';')
-            s.newline()
+        inner_function(action_label, function, action_params)
 
         if len(action_params):
             s.unindent()
@@ -178,7 +205,27 @@ class ModelGenerator(JavaFileEmitter):
 
         s.newline()
 
-    def emitGuard(s, guarded_actor, guarded_instance):
-        s.emit('guard:')
+    def assignments(s, action_label, function, action_params):
+        for ass in function.assignments:
+            s.emit('self.' + ass.prop, '=', ass.val, ';')
+            s.newline()
+
+    def emitAnyOrNot(s, var, sort, nots):
+        s.emit('(')
         s.newline()
-        pass
+        s.indent()
+        items = s.symbolTable['sorts'][sort]['items']
+        for item in items:
+            if item not in nots:
+                s.emit(var)
+                s.emit('==')
+                s.emit(item)
+                s.emit('||')
+                s.newline()
+        s.tosstoken()
+        s.unindent()
+        s.emit(')')
+
+    def returnTrue(s, action_label, function, action_params):
+        s.emit('return', 'true', ';')
+        s.newline()

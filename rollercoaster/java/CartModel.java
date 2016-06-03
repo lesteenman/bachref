@@ -7,7 +7,7 @@ public class CartModel {
 	boolean open ;
 	boolean locked ;
 	
-	public  ( Segment pos , boolean open , boolean locked ) {
+	public CartModel ( Segment pos , boolean open , boolean locked ) {
 		self.pos = pos ;
 		self.open = open ;
 		self.locked = locked ;
@@ -61,6 +61,222 @@ public class CartModel {
 		}
 	}
 	
+	
+	public allowsCart2Forward ( Segment segment1 , Segment segment2 ) {
+		if ( pos == station ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == lift ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == main ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == braking ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == repair ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		return false ;
+	}
+	
+	public allowsCart2Backward ( Segment segment1 , Segment segment2 ) {
+		if ( (
+			segment1 == station ||
+			segment1 == lift ||
+			segment1 == main ||
+			segment1 == braking ||
+			segment1 == repair
+		) && (
+			segment2 == station ||
+			segment2 == lift ||
+			segment2 == main ||
+			segment2 == braking ||
+			segment2 == repair
+		) ) {
+			return true ;
+		}
+		return false ;
+	}
+	
+	public allowsCart1Forward ( Segment segment1 , Segment segment2 ) {
+		if ( pos == station ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == lift ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == main ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == braking ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		if ( pos == repair ) {
+			if ( (
+				segment1 == station ||
+				segment1 == lift ||
+				segment1 == main ||
+				segment1 == braking ||
+				segment1 == repair
+			) && (
+				segment2 == station ||
+				segment2 == lift ||
+				segment2 == main ||
+				segment2 == braking ||
+				segment2 == repair
+			) ) {
+				return true ;
+			}
+		}
+		return false ;
+	}
+	
+	public allowsCart1Backward ( Segment segment1 , Segment segment2 ) {
+		if ( (
+			segment1 == station ||
+			segment1 == lift ||
+			segment1 == main ||
+			segment1 == braking ||
+			segment1 == repair
+		) && (
+			segment2 == station ||
+			segment2 == lift ||
+			segment2 == main ||
+			segment2 == braking ||
+			segment2 == repair
+		) ) {
+			return true ;
+		}
+		return false ;
+	}
 	
 }
 

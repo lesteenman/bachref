@@ -7,7 +7,7 @@ public class TrafficLight2Model {
 	boolean is_yellow ;
 	boolean is_green ;
 	
-	public  ( boolean is_red , boolean is_yellow , boolean is_green ) {
+	public TrafficLight2Model ( boolean is_red , boolean is_yellow , boolean is_green ) {
 		self.is_red = is_red ;
 		self.is_yellow = is_yellow ;
 		self.is_green = is_green ;
@@ -43,6 +43,22 @@ public class TrafficLight2Model {
 		}
 	}
 	
+	
+	public allowsLight2Green ( ) {
+		if ( is_red == true ) {
+			return true ;
+			
+		}
+		return false ;
+	}
+	
+	public allowsLight1Green ( ) {
+		if ( is_red == true ) {
+			return true ;
+			
+		}
+		return false ;
+	}
 	
 }
 

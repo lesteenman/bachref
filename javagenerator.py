@@ -3,6 +3,7 @@ from collections import deque
 from pprint import *
 
 from consoleprogramgenerator import ConsoleProgramGenerator
+from controllergenerator import ControllerGenerator
 from modelgenerator import ModelGenerator
 from sortsgenerator import SortsGenerator
 
@@ -41,15 +42,3 @@ class JavaGenerator:
         self.java.update(controller)
 
         return self.java
-
-    def emitController(s):
-        # TODO: Sorts
-        # TODO: Comms
-        pass
-
-    def emitModels(s, actors):
-        for actor in actors:
-            s.emitModel(actor)
-
-    def emitModel(s, actor):
-        s.openFile(actor['identifier'])

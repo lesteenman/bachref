@@ -7,7 +7,7 @@ public class TrafficLight3Model {
 	boolean is_yellow ;
 	boolean is_green ;
 	
-	public  ( boolean is_red , boolean is_yellow , boolean is_green ) {
+	public TrafficLight3Model ( boolean is_red , boolean is_yellow , boolean is_green ) {
 		self.is_red = is_red ;
 		self.is_yellow = is_yellow ;
 		self.is_green = is_green ;

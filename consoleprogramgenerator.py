@@ -3,8 +3,6 @@ from collections import deque
 from pprint import *
 from javafileemitter import JavaFileEmitter
 
-# TODO: Translate to Java
-
 class ConsoleProgramGenerator(JavaFileEmitter):
     className = 'ConsoleProgram'
     imports = ['models.*', 'models.Sorts.*']
@@ -27,5 +25,8 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.unindent()
         s.emit('}')
 
+        # TODO: Main method
         # TODO: Allow'ed methods
+        # TODO: In- and output from the console
+        # TODO: Print current allowed methods to console
         s.closeClass()
