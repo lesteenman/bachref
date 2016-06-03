@@ -14,6 +14,7 @@ class ControllerGenerator(JavaFileEmitter):
         s.openClass()
         s.emitProperties()
         s.emitFunctionBlock(name=s.className, func=s.constructor)
+        s.emitActions()
         s.emitGuards()
         s.closeClass()
 
@@ -68,7 +69,24 @@ class ControllerGenerator(JavaFileEmitter):
                     function_name = function_name[0].lower() + function_name[1:]
 
                     s.emitFunctionBlock(name=function_name, returntype='boolean', funcparams=[guards, guarded_instance, action, parameter_names], func=s.isAllowed, params=parameters)
+    
+    def emitActions(s):
+        for action_id, action in s.symbolTable['actions'].iteritems():
+            actor = action['actor']
+            instances = s.symbolTable['actors'][actor]['instances'].keys()
+            for instance in instances:
+                # s.emit(str(action))
+                function_name = s.namegen.camelcase('perform_' + instance + '_' + action['identifier'], True)
 
+                parameters = []
+                parameter_names = []
+                i = 0
+                for param in action['parameters']:
+                    i += 1
+                    parameters.append(param + ' ' + param.lower() + str(i))
+                    parameter_names.append(param.lower() + str(i))
+
+                s.emitFunctionBlock(name=function_name, returntype='boolean', funcparams=[instance, action, parameter_names], func=s.performAction, params=parameters)
 
     def isAllowed(s, guards, guarded_instance, action, parameters):
         s.emit('boolean', 'allow', '=', 'true', ';')
@@ -92,6 +110,43 @@ class ControllerGenerator(JavaFileEmitter):
         s.emit('return', 'allow', ';')
         s.newline()
 
-    # TODO: Generate an 'action' method for each action that can be performed, which is only performed if the 'allows*' method returns true.
-    def performAction(s, action):
-        pass
+    def performAction(s, instance, action, parameters):
+        # guardLabel(self, guarding_actor_id, guarded_actor_id, action_id):
+        s.emit('if', '(')
+
+        # Test guard
+        guard_label = s.namegen.camelcase('is_' + action['identifier'] + '_allowed', True)
+        s.emit('self.' + guard_label, '(')
+        if len(parameters):
+            for param in parameters:
+                s.emit(param)
+                s.emit(',')
+            s.tosstoken()
+        s.emit(')')
+
+        s.emit(')', '{')
+        s.newline()
+        s.indent()
+
+        # Perform action
+        s.emit('return', 'self.' + instance + '.' + action['identifier'], '(')
+        if len(parameters):
+            for param in parameters:
+                s.emit(param)
+                s.emit(',')
+            s.tosstoken()
+        s.emit(')', ';')
+        s.newline()
+
+        s.unindent()
+        s.emit('}', 'else', '{')
+        s.newline()
+        s.indent()
+        s.emit('return', 'false', ';')
+        s.newline()
+
+        s.unindent()
+        s.emit('}')
+        s.newline()
+
+

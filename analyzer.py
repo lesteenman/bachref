@@ -39,7 +39,7 @@ class Analyzer:
     def analyze(self):
         self.buildSortsTable()
         self.buildActorsTable()
-        self.buildActionTable()
+        self.buildActionsTable()
 
         if len(self.parseErrors):
             print 'Errors occured during parsing:'
@@ -70,7 +70,7 @@ class Analyzer:
                     're': re.compile(r'(' + '|'.join(items) + ')')
                 }
 
-    def buildActionTable(self):
+    def buildActionsTable(self):
         for actor in self.model.actors:
             for action in actor.actions:
                 # print action.dump()
