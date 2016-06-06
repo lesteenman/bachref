@@ -121,7 +121,7 @@ actors: {
 		}
 	}
 
-	switch: {
+	sw: {
 		states: {
 			pos: SwitchPos
 		}

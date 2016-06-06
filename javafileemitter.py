@@ -14,10 +14,11 @@ class JavaFileEmitter(object):
     extends = None
     className = ''
 
-    def __init__(self, model, symbolTable, package):
+    def __init__(self, model, symbolTable, package, root_package):
         self.model = model
         self.symbolTable = symbolTable
         self.package = package
+        self.root_package = root_package
 
         self.namegen = Names(symbolTable, 'java')
         self.files = {} # All files
@@ -48,6 +49,21 @@ class JavaFileEmitter(object):
             if not isinstance(t, str):
                 raise Exception('Attempting to emit a non-string type: ' + str(t))
             self.line.append(t)
+
+    def emitProperty(*args):
+        tokens = list(args)
+        self = tokens.pop(0)
+        token = ''
+        for t in tokens:
+            token += t + '.'
+        self.line.append(token[:-1])
+
+    def emitLine(self, line):
+        if len(self.line) > 0:
+            self.newline()
+
+        self.line.append(line)
+        self.newline()
 
     def startBlock(self, name):
         if self.debug:
@@ -82,7 +98,7 @@ class JavaFileEmitter(object):
         if s.fileName:
             s.closeFile()
 
-        s.fileName = f
+        s.fileName = s.package + '.' + f
         s.lines = s.files.get(f, [])
 
     # Close the current file
@@ -110,11 +126,14 @@ class JavaFileEmitter(object):
     # Some common emits
 
     # Public, returntype, params, func, funcparams
-    def emitFunctionBlock(s, public=True, returntype=None, name='', params=[], func=None, funcparams=[]):
+    def emitFunctionBlock(s, public=True, static=False, returntype=None, name='', params=[], func=None, funcparams=[]):
         if public:
             s.emit('public')
         else:
             s.emit('protected')
+
+        if static:
+            s.emit('static')
 
         if returntype:
             s.emit(returntype)
@@ -140,7 +159,7 @@ class JavaFileEmitter(object):
 
 
     def openClass(s):
-        s.emit('package', s.package)
+        s.emit('package', s.package, ';')
         s.newline()
 
         s.jEmitImports(s.imports)

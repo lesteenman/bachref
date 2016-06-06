@@ -2,7 +2,6 @@
 from parser import Parser
 from javagenerator import JavaGenerator
 from analyzer import Analyzer
-import os
 import pprint
 
 print 'Basic Example...'
@@ -17,12 +16,7 @@ with open("example/example.im", 'r') as f:
         if correct:
             generator = JavaGenerator(parser.im, analyzer.symbolTable, 'example')
             java = generator.toJava()
-            print 'Java generated.'
-            pp = pprint.PrettyPrinter()
-            for f, data in java.iteritems():
-                with open('example/java/' + f + '.java', 'w') as out:
-                    out.write(data)
-                    print 'Wrote ' + f + '.java'
+            generator.writeFiles('example/java')
         else:
             exit(1)
 
@@ -44,10 +38,7 @@ with open("rollercoaster/rollercoaster.im", 'r') as f:
             generator = JavaGenerator(parser.im, analyzer.symbolTable, 'rollercoaster')
             java = generator.toJava()
             print 'Java generated.'
-            for f, data in java.iteritems():
-                with open('rollercoaster/java/' + f + '.java', 'w') as out:
-                    out.write(data)
-                    print 'Wrote ' + f + '.java'
+            generator.writeFiles('rollercoaster/java')
         else:
             exit(1)
 

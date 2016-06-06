@@ -23,7 +23,7 @@ class SortsGenerator(JavaFileEmitter):
         s.closeClass()
 
     def emitEnum(s, enum, enum_data):
-        s.emit('enum', s.namegen.className(enum), '{')
+        s.emit('public', 'enum', s.namegen.className(enum), '{')
         s.newline()
         s.indent()
         for item in enum_data['items']:

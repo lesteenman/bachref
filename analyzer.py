@@ -55,10 +55,12 @@ class Analyzer:
     def buildSortsTable(self):
         # print self.model.sorts.dump()
         for sort in self.model.sorts:
+            self.testKeyword(sort)
             if sort.struct:
                 identifier = sort.identifier
                 items = []
                 for item in sort.struct.opts:
+                    self.testKeyword(item)
                     items.append(item)
                 
                 if identifier in self.symbolTable['sorts']:
@@ -75,6 +77,7 @@ class Analyzer:
             for action in actor.actions:
                 # print action.dump()
                 identifier = action.identifier
+                self.testKeyword(identifier)
 
                 parameters = []
                 for parameter_type in action.parameter_types:
@@ -118,6 +121,8 @@ class Analyzer:
         actors = {}
 
         for actor in self.model.actors:
+            self.testKeyword(actor.identifier)
+
             if actor.identifier in actors:
                 self.parseError('Duplicate actor identifier: ' + str(actor.identifier))
 
@@ -168,3 +173,13 @@ class Analyzer:
             }
 
         self.symbolTable['actors'] = actors
+
+    def testKeyword(self, keyword):
+        illegalchars = [
+            'switch',
+            'if',
+            'else'
+        ]
+
+        if keyword in illegalchars:
+            self.parseError('Illegal keyword used: ' + str(keyword))

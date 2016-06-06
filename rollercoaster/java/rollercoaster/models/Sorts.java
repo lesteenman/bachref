@@ -1,19 +1,19 @@
-package rollercoaster.models
+package rollercoaster.models ;
 
 
 public class Sorts {
-	enum SwitchPos {
+	public enum SwitchPos {
 		up ,
 		down
 	}
-	enum Segment {
+	public enum Segment {
 		station ,
 		lift ,
 		main ,
 		braking ,
 		repair
 	}
-	enum CartId {
+	public enum CartId {
 		cart1 ,
 		cart2
 	}
