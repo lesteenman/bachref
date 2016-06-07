@@ -169,8 +169,6 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.unindent()
         s.newline()
 
-    # TODO: Better printing
-    # TODO: Fix the execute labels
     def printStates(s):
         s.emitLine('System.out.println("Current states:");')
         s.emitLine('HashMap<String, HashMap<String, String>> states = this.controller.getStates();')
