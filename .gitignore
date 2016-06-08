@@ -3,3 +3,9 @@
 *.lts
 *.swp
 *.pyc
+
+*.class
+example/java/example/ConsoleProgram.java
+example/java/example/models/*
+rollercoaster/java/rollercoaster/ConsoleProgram.java
+rollercoaster/java/rollercoaster/models/*

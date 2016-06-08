@@ -1,3 +1,13 @@
+This file describes the grammar for the IM. 
+In each grammar segment, there are a number of elements:
+ - Text between <> refers to another grammar segment.
+ - A label prefixed with opt: is optional.
+ - ... denote that the previous grammar item can be repeated.
+ - All other text in a segment denotes that those exact characters are expected.
+Note that the grammar is not indentation-sensitive, but it is newline-sensitive.
+
+A visual representation of this grammar can also be found in the files 'Abstract Syntax Tree'.
+
 model:
 	opt: <sorts>
 	<actors>
@@ -23,7 +33,7 @@ actors:
 
 actor:
 	<identifier>: {
-		opt: <instances>
+		<instances>
 		opt: <states>
 		opt: <actions>
 		opt: <guards>
@@ -88,7 +98,7 @@ ifelse:
 	if (<condition>) <function_block>
 	opt: elseif (<condition>) <function_block>
 	opt: ...
-	opt: else (<condition>) <function_block>
+	opt: else <function_block>
 
 condition:
 	comp
@@ -118,8 +128,6 @@ function:
 
 parameter:
 	<identifier>
-	OR
-	Other(<Type>)
 	OR
 	Any(<Type>)
 	OR

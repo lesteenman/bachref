@@ -1,6 +1,5 @@
 sorts: {
 	Segment: struct(station, lift, main, braking, repair)
-	Cart_Id: struct(cart1, cart2)
 	SwitchPos: struct(up, down)
 }
 
