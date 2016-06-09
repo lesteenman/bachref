@@ -4,10 +4,10 @@ from mcrl2generator import Mcrl2Generator
 from analyzer import Analyzer
 from mcrl2tool import Mcrl2Helper
 
-print 'Basic Example...'
-with open("example/example.im", 'r') as f:
-	example = f.read()
-	parser = Parser(example)
+print 'Traffic Lights...'
+with open("trafficlights_v1/trafficlights.im", 'r') as f:
+	trafficlights = f.read()
+	parser = Parser(trafficlights)
 	parser.parse()
 
 	analyzer = Analyzer(parser.im)
@@ -16,26 +16,19 @@ with open("example/example.im", 'r') as f:
         if correct:
             generator = Mcrl2Generator(parser.im, analyzer.symbolTable)
             mcrl2 = generator.toMcrl2()
-            with open("example/example.mcrl2", 'w') as out:
+            with open("trafficlights_v1/trafficlights.mcrl2", 'w') as out:
                 out.write(mcrl2)
                 print 'MCRL2 generated.'
         else:
             exit(1)
 
-                # helper = Mcrl2Helper('example')
-                # if helper.mcrl22lps():
-                #     if helper.lps2lts():
-                #         helper.graph()
-
-# exit()
-
 print ''
 print ''
 
-print 'Advanced Example...'
+print 'Rollercoaster...'
 with open("rollercoaster/rollercoaster.im", 'r') as f:
-	example = f.read()
-	parser = Parser(example)
+	rollercoaster = f.read()
+	parser = Parser(rollercoaster)
 	parser.parse()
 
         analyzer = Analyzer(parser.im)
@@ -49,13 +42,5 @@ with open("rollercoaster/rollercoaster.im", 'r') as f:
                 print 'MCRL2 generated.'
         else:
             exit(1)
-
-                # helper = Mcrl2Helper()
-                # lps = helper.mcrl22lps(mcrl2)
-                # if lps:
-                #     lts = helper.lps2lts(lps)
-                #     if lts:
-                #         helper.graph(lts)
-
 
 exit(0)

@@ -4,31 +4,29 @@ from javagenerator import JavaGenerator
 from analyzer import Analyzer
 import pprint
 
-print 'Basic Example...'
-with open("example/example.im", 'r') as f:
-	example = f.read()
-	parser = Parser(example)
+print 'Traffic Lights...'
+with open("trafficlights_v1/trafficlights.im", 'r') as f:
+	trafficlights = f.read()
+	parser = Parser(trafficlights)
 	parser.parse()
 
 	analyzer = Analyzer(parser.im)
 	correct = analyzer.analyze();
 
         if correct:
-            generator = JavaGenerator(parser.im, analyzer.symbolTable, 'example')
+            generator = JavaGenerator(parser.im, analyzer.symbolTable, 'trafficlights')
             java = generator.toJava()
-            generator.writeFiles('example/java')
+            generator.writeFiles('trafficlights_v1/java')
         else:
             exit(1)
 
-# exit()
-
 print ''
 print ''
 
-print 'Advanced Example...'
+print 'Rollercoaster...'
 with open("rollercoaster/rollercoaster.im", 'r') as f:
-	example = f.read()
-	parser = Parser(example)
+	rollercoaster = f.read()
+	parser = Parser(rollercoaster)
 	parser.parse()
 
         analyzer = Analyzer(parser.im)

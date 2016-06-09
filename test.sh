@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Compiling examples to MCRL2:"
+echo "Compiling traffic lights to MCRL2:"
 python im2mcrl2.py
 
 if [ $? -ne 0 ]; then
@@ -12,12 +12,12 @@ fi
 echo ""
 echo ""
 
-echo "Validating example:"
+echo "Validating traffic lights:"
 error=0
 
-cd example
+cd trafficlights_v1
 
-result="$(mcrl22lps --lin-method=stack -q example.mcrl2)"
+result="$(mcrl22lps --lin-method=stack -q trafficlights.mcrl2)"
 if [ ! -z "$result" ]; then
 	echo "Success!"
 else
@@ -55,7 +55,7 @@ fi
 
 
 
-echo "Compiling examples to Java:"
+echo "Compiling traffic lights to Java:"
 
 python im2java.py
 
@@ -66,11 +66,11 @@ fi
 
 
 
-echo "Attempting to compile example:"
+echo "Attempting to compile traffic lights:"
 
-cd example/java
+cd trafficlights_v1/java
 
-javac example/*.java example/models/*.java
+javac trafficlights/*.java trafficlights/models/*.java
 
 if [ $? -ne 0 ]; then
 	echo "Compilation failed."
