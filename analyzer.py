@@ -202,6 +202,13 @@ class Analyzer:
                         self.parseError('More assignments than parameters in instance ' + instance.identifier)
 
                     instances[instance.identifier] = assignments
+
+                    for a_id, a in actors.iteritems():
+                        if instance.identifier in a['instances']:
+                            self.parseError('Duplicate instance name: ' + instance.identifier + \
+                                    ' in both ' + actor.identifier + ' and ' + \
+                                    a_id)
+
             else:
                 assignments = {}
                 numassignments = 0

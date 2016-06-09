@@ -214,10 +214,6 @@ class Mcrl2Generator:
             actor = s.symbolTable['actors'][action['actor']]
 
             for instance in actor['instances']:
-                # pp = PrettyPrinter()
-                # print 'Prettyprint, ' + str(action['actor'])
-                # pp.pprint(guards)
-
                 action_guards = guards.get(action['actor'], {}).get(instance, {}).get(action['identifier'], [])
 
                 s.emit(s.nameGen.actionLabel(instance, action['identifier']))
