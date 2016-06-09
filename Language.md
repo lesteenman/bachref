@@ -11,6 +11,8 @@ Comments can also be added to a model description. Everything after a $\#$ will 
 
 An IM is constructed from 2 main elements: Sorts and Actors. Both are declared in their respective top-level block, between the braces of a _sorts_ or _actors_ block respectively. While sorts are completely optional, there has to be at least one actor, so the _actors_ block is required.
 
+![Abstract Syntax Tree of language](/Abstract Syntax Tree IM.png)
+
 ##Sort
 
 A sort is a custom type that can be defined. One example of a custom sort is the position of a switch (i.e. up or down). In this iteration of the grammar, only one type of custom sorts is supported: Structs. These consist of a list of possible items.
