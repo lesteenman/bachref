@@ -17,6 +17,8 @@ Using this project
 ==================
 This repository contains programs that can convert a simple language into both an MCRL2 model and into part of a Java program. Examples of this language can be found in the _example_ and _rollercoaster_ directories (\*.im files). The scripts _parser.py_ and _analyzer.py_ are used to check the intermediary model files. The scripts _mcrl2generator.py_ and _javagenerator.py_ can be used to convert these in MCRL2 and Java, respectively. Example usage of these scripts can be found in _im2mcrl2.py_ and _im2java.py_.
 
+In the _trafficlights_ directory, you will also find a _compile.sh_ script. This can be used as an example of how to parse your model as well.
+
 Language
 ========
 A description of the language can be found in _Language.md_.
