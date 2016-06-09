@@ -21,4 +21,4 @@ In the _trafficlights_ directory, you will also find a _compile.sh_ script. This
 
 Language
 ========
-A description of the language can be found in _Language.md_.
+A description of the language can be found in [Language.md](/Language.md).
