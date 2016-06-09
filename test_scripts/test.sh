@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 echo "Compiling traffic lights to MCRL2:"
 python im2mcrl2.py
 
@@ -15,7 +17,7 @@ echo ""
 echo "Validating traffic lights:"
 error=0
 
-cd trafficlights_v1
+cd ../trafficlights_v1
 
 result="$(mcrl22lps --lin-method=stack -q trafficlights.mcrl2)"
 if [ ! -z "$result" ]; then
@@ -25,7 +27,7 @@ else
 	error=1
 fi
 
-cd ..
+cd -
 echo ""
 echo ""
 
@@ -33,7 +35,7 @@ echo ""
 
 echo "Validating rollercoaster:"
 
-cd rollercoaster
+cd ../rollercoaster
 
 result="$(mcrl22lps --lin-method=stack -q rollercoaster.mcrl2)"
 if [ ! -z "$result" ]; then
@@ -44,7 +46,7 @@ else
 fi
 
 
-cd ..
+cd -
 echo ""
 echo ""
 
@@ -56,6 +58,7 @@ fi
 
 
 echo "Compiling traffic lights to Java:"
+echo "$PWD"
 
 python im2java.py
 
@@ -68,7 +71,7 @@ fi
 
 echo "Attempting to compile traffic lights:"
 
-cd trafficlights_v1/java
+cd ../trafficlights_v1/java
 
 javac trafficlights/*.java trafficlights/models/*.java
 
@@ -79,12 +82,12 @@ else
 	echo "Compiled"
 fi
 
-cd ../..
+cd -
 
 
 echo "Attempting to compile rollercoaster:"
 
-cd rollercoaster/java
+cd ../rollercoaster/java
 
 javac rollercoaster/*.java rollercoaster/models/*.java
 
@@ -95,4 +98,4 @@ else
 	echo "Compiled"
 fi
 
-cd ../..
+cd -

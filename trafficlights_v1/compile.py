@@ -2,7 +2,7 @@
 
 # Make sure we can import the files from the root dir
 import sys
-sys.path.insert(0, '../')
+sys.path.insert(0, '../parser')
 
 from parser import Parser
 from mcrl2generator import Mcrl2Generator

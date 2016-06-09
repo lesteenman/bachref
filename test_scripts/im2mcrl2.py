@@ -1,11 +1,13 @@
 #!python
+import sys
+sys.path.insert(0, '../parser')
+
 from parser import Parser
 from mcrl2generator import Mcrl2Generator
 from analyzer import Analyzer
-from mcrl2tool import Mcrl2Helper
 
 print 'Traffic Lights...'
-with open("trafficlights_v1/trafficlights.im", 'r') as f:
+with open("../trafficlights_v1/trafficlights.im", 'r') as f:
 	trafficlights = f.read()
 	parser = Parser(trafficlights)
 	parser.parse()
@@ -16,7 +18,7 @@ with open("trafficlights_v1/trafficlights.im", 'r') as f:
         if correct:
             generator = Mcrl2Generator(parser.im, analyzer.symbolTable)
             mcrl2 = generator.toMcrl2()
-            with open("trafficlights_v1/trafficlights.mcrl2", 'w') as out:
+            with open("../trafficlights_v1/trafficlights.mcrl2", 'w') as out:
                 out.write(mcrl2)
                 print 'MCRL2 generated.'
         else:
@@ -26,7 +28,7 @@ print ''
 print ''
 
 print 'Rollercoaster...'
-with open("rollercoaster/rollercoaster.im", 'r') as f:
+with open("../rollercoaster/rollercoaster.im", 'r') as f:
 	rollercoaster = f.read()
 	parser = Parser(rollercoaster)
 	parser.parse()
@@ -37,7 +39,7 @@ with open("rollercoaster/rollercoaster.im", 'r') as f:
         if correct:
             generator = Mcrl2Generator(parser.im, analyzer.symbolTable)
             mcrl2 = generator.toMcrl2()
-            with open("rollercoaster/rollercoaster.mcrl2", 'w') as out:
+            with open("../rollercoaster/rollercoaster.mcrl2", 'w') as out:
                 out.write(mcrl2)
                 print 'MCRL2 generated.'
         else:
