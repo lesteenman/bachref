@@ -170,7 +170,7 @@ class ModelGenerator(JavaFileEmitter):
             for elseifst in elseifs:
                 s.emit('else', 'if', '(')
 
-                s.emitCondition(elseifst.condition, action_params)
+                s.emitCondition(elseifst.condition, types)
 
                 s.emit(')', '{')
                 s.newline()

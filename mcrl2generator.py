@@ -436,26 +436,26 @@ class Mcrl2Generator:
 
         if elseifst and len(elseifst):
             stat = elseifst.pop(0)
-            s.emitElseIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guards)
+            s.emitElseIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guarded_actor_instance)
         elif elsest:
-            s.emitElse(actor_instance, function_id, elsest, guards)
+            s.emitElse(actor_instance, function_id, elsest, guarded_actor_instance)
 
         s.endBlock('if')
 
-    def emitElseIf(s, actor_id, actor_instance, function_id, stat, elseifst, elsest, guards):
+    def emitElseIf(s, actor_id, actor_instance, function_id, stat, elseifst, elsest, guarded_actor_instance):
         s.startBlock('elseif')
 
         s.emit('<>', '(')
         s.newline()
         s.indent()
-        s.emitIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guards)
+        s.emitIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guarded_actor_instance)
         s.emit(')')
         s.unindent()
         s.newline()
 
         s.endBlock('elseif')
 
-    def emitElse(s, actor_id, actor_instance, function_id, elsest, guards):
+    def emitElse(s, actor_id, actor_instance, function_id, elsest, guarded_actor_instance):
         s.startBlock('else')
 
         s.emit('<>')
