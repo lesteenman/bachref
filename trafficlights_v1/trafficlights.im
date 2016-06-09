@@ -1,0 +1,532 @@
+sorts: {
+    WindDir: struct(north, east, south, west)
+    Color: struct(red, yellow, green)
+}
+
+actors: {
+    straight_light: {
+        # Test
+        states: {
+            winddir: WindDir
+            color: Color
+        }
+
+        instances: {
+            straight_north: {
+                winddir = north
+                color = red
+            }
+
+            straight_east: {
+                winddir = east
+                color = red
+            }
+
+            straight_south: {
+                winddir = south
+                color = red
+            }
+
+            straight_west: {
+                winddir = west
+                color = red
+            }
+        }
+
+        actions: {
+            green(): {
+                if (color == red) {
+                    -> {
+                        color = green
+                    }
+                }
+            }
+
+            yellow(): {
+                if (color == green) {
+                    -> {
+                        color = yellow
+                    }
+                }
+            }
+
+            red(): {
+                if (color == yellow) {
+                    -> {
+                        color = red
+                    }
+                }
+            }
+        }
+
+        guards: {
+            # Straight vs straight guards
+            straight_north: {
+                green: {
+                    if (winddir == east || winddir == west) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_south: {
+                green: {
+                    if (winddir == east || winddir == west) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_east: {
+                green: {
+                    if (winddir == north || winddir == south) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_west: {
+                green: {
+                    if (winddir == north || winddir == south) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            # Straight vs right guards
+            # north blocks west
+            # east blocks north
+            # south blocks east
+            # west blocks south
+
+            right_north: {
+                green: {
+                    if (winddir == east) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+
+            }
+
+            right_east: {
+                green: {
+                    if (winddir == south) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            right_south: {
+                green: {
+                    if (winddir == west) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            right_west: {
+                green: {
+                    if (winddir == north) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            # Straight vs left guards
+            # Any straight will block all left-turns.
+            left_light: {
+                green: {
+                    if (color == red) {
+                        -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    right_light: {
+        states: {
+            winddir: WindDir
+            color: Color
+        }
+
+        instances: {
+            right_north: {
+                winddir = north
+                color = red
+            }
+
+            right_east: {
+                winddir = east
+                color = red
+            }
+
+            right_south: {
+                winddir = south
+                color = red
+            }
+
+            right_west: {
+                winddir = west
+                color = red
+            }
+        }
+
+        actions: {
+            green(): {
+                if (color == red) {
+                    -> {
+                        color = green
+                    }
+                }
+            }
+
+            yellow(): {
+                if (color == green) {
+                    -> {
+                        color = yellow
+                    }
+                }
+            }
+
+            red(): {
+                if (color == yellow) {
+                    -> {
+                        color = red
+                    }
+                }
+            }
+        }
+
+        guards: {
+            # right vs straight guards
+            # each blocks the one counterclockwise to it
+            straight_north: {
+                green: {
+                    if (winddir == east) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_east: {
+                green: {
+                    if (winddir == south) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_south: {
+                green: {
+                    if (winddir == west) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            straight_west: {
+                green: {
+                    if (winddir == north) {
+                        if (color == red) {
+                            -> {}
+                        }
+                    } else {
+                        -> {}
+                    }
+                }
+            }
+
+            # There are noright vs right guards.
+
+            # right vs left guards
+            # right blocks the opposite light to the left
+			left_north: {
+				green: {
+					if (winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			left_east: {
+				green: {
+					if (winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+			
+			left_south: {
+				green: {
+					if (winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			left_west: {
+				green: {
+					if (winddir == east) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+        }
+
+    }
+
+    left_light: {
+        states: {
+            winddir: WindDir
+            color: Color
+        }
+
+        instances: {
+            left_north: {
+                winddir = north
+                color = red
+            }
+
+            left_east: {
+                winddir = east
+                color = red
+            }
+
+            left_south: {
+                winddir = south
+                color = red
+            }
+
+            left_west: {
+                winddir = west
+                color = red
+            }
+        }
+
+        actions: {
+            green(): {
+                if (color == red) {
+                    -> {
+                        color = green
+                    }
+                }
+            }
+
+            yellow(): {
+                if (color == green) {
+                    -> {
+                        color = yellow
+                    }
+                }
+            }
+
+            red(): {
+                if (color == yellow) {
+                    -> {
+                        color = red
+                    }
+                }
+            }
+        }
+
+        guards: {
+            # left vs straight guards
+            # prevents straight on all other directions
+			straight_north: {
+				green: {
+					if (color == red) {
+						-> {}
+					}
+				}
+			}
+
+			straight_east: {
+				green: {
+					if (color == red) {
+						-> {}
+					}
+				}
+			}
+
+			straight_south: {
+				green: {
+					if (color == red) {
+						-> {}
+					}
+				}
+			}
+
+			straight_west: {
+				green: {
+					if (color == red) {
+						-> {}
+					}
+				}
+			}
+
+
+            # left vs right guards
+            # prevents right on opposite direction
+			right_north: {
+				green: {
+					if (winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			right_east: {
+				green: {
+					if (winddir == west) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			right_south: {
+				green: {
+					if (winddir == north) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			right_west: {
+				green: {
+					if (winddir == east) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+
+            # left vs left guards
+            # prevents left on adjecent directions
+			left_north: {
+				green: {
+					if (winddir == east || winddir == west) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			left_east: {
+				green: {
+					if (winddir == north || winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			left_south: {
+				green: {
+					if (winddir == east || winddir == west) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			left_west: {
+				green: {
+					if (winddir == north || winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+        }
+    }
+}
