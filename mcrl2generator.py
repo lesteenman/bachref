@@ -406,7 +406,7 @@ class Mcrl2Generator:
 
                 ifelse = block.ifelse
                 if ifelse.ifst:
-                    s.emitIf(actor_id, actor_instance, function_id, ifelse.ifst, ifelse.elseifst, ifelse.elsest, guarded_actor_instance)
+                    s.emitIf(actor_id, actor_instance, function_id, ifelse.ifst, list(ifelse.elseifst), ifelse.elsest, guarded_actor_instance)
 
             elif block.function:
                 s.constructFunctionParameters(actor_id, actor_instance, guarded_actor_instance, function_id, block.function.assignments, list(block.function.parameters), [])
@@ -438,7 +438,7 @@ class Mcrl2Generator:
             stat = elseifst.pop(0)
             s.emitElseIf(actor_id, actor_instance, function_id, stat, elseifst, elsest, guarded_actor_instance)
         elif elsest:
-            s.emitElse(actor_instance, function_id, elsest, guarded_actor_instance)
+            s.emitElse(actor_id, actor_instance, function_id, elsest, guarded_actor_instance)
 
         s.endBlock('if')
 
