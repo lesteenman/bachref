@@ -7,5 +7,7 @@
 *.class
 example/java/example/ConsoleProgram.java
 example/java/example/models/*
+trafficlights/trafficlights/example/ConsoleProgram.java
+trafficlights/java/trafficlights/models/*
 rollercoaster/java/rollercoaster/ConsoleProgram.java
 rollercoaster/java/rollercoaster/models/*

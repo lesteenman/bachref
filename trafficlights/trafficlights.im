@@ -1,0 +1,119 @@
+sorts: {
+	WindDir: struct(north, east, south, west)
+	Color: struct(red, yellow, green)
+}
+
+actors: {
+	straight_light: {
+		states: {
+			winddir: WindDir
+			color: Color
+		}
+
+		instances: {
+			straight_north: {
+				winddir = north
+				color = red
+			}
+
+			straight_east: {
+				winddir = east
+				color = red
+			}
+
+			straight_south: {
+				winddir = south
+				color = red
+			}
+
+			straight_west: {
+				winddir = west
+				color = red
+			}
+		}
+
+		actions: {
+			green(): {
+				if (color == red) {
+					-> {
+						color = green
+					}
+				}
+			}
+
+			yellow(): {
+				if (color == green) {
+					-> {
+						color = yellow
+					}
+				}
+			}
+
+			red(): {
+				if (color == yellow) {
+					-> {
+						color = red
+					}
+				}
+			}
+		}
+
+		guards: {
+			straight_south: {
+				green: {
+					if (winddir == east || winddir == west) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			straight_north: {
+				green: {
+					if (winddir == east || winddir == west) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			straight_east: {
+				green: {
+					if (winddir == north || winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+
+			straight_west: {
+				green: {
+					if (winddir == north || winddir == south) {
+						if (color == red) {
+							-> {}
+						}
+					} else {
+						-> {}
+					}
+				}
+			}
+		}
+	}
+
+	# right_light: {
+
+	# }
+
+	# left_light: {
+
+	# }
+}
