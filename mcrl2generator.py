@@ -499,16 +499,18 @@ class Mcrl2Generator:
 
     def emitGuards(s, actor_id, actor_instance, guarded_actors):
         s.startBlock('guards')
+        pp = PrettyPrinter()
 
         for guarded_actor in guarded_actors:
-            # Guarded actor will either be an actor or an instance
-            guarded_actor_instance = guarded_actor.actor
+            # print ''
+            # print 'Guarded actor:'
+            # pp.pprint(guarded_actor.actor)
+            guarded_actor_class = s.instanceOf(guarded_actor.actor)
 
-            guarded_actor_class = s.instanceOf(guarded_actor_instance)
             if guarded_actor_class != None:
-                s.emitGuardedActor(actor_id, actor_instance, guarded_actor, guarded_actor_instance)
+                s.emitGuardedActor(actor_id, actor_instance, guarded_actor, guarded_actor.actor)
             else:
-                guarded_actor_entry = s.symbolTable['actors'][guarded_actor_instance]
+                guarded_actor_entry = s.symbolTable['actors'][guarded_actor.actor]
                 for instance in guarded_actor_entry['instances']:
                     if instance != actor_instance:
                         s.emitGuardedActor(actor_id, actor_instance, guarded_actor, instance)

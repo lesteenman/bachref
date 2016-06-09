@@ -70,6 +70,7 @@ class ModelGenerator(JavaFileEmitter):
             s.newline()
 
     def emitGuards(s):
+        pp = PrettyPrinter()
         for guarded_actor in s.actor.guarded_actors:
             guarded_actor_class = s.instanceOf(guarded_actor.actor)
 

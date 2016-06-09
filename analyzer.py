@@ -101,9 +101,6 @@ class Analyzer:
                 }
                 self.symbolTable['actions'][action_label] = entry
 
-        # pp = PrettyPrinter()
-        # pp.pprint(self.symbolTable['actions'])
-
     def buildGuardsTable(self):
         guards = {}
         for actor in self.model.actors:
@@ -119,8 +116,13 @@ class Analyzer:
                         action_label = instanceOf + action_label
                         actor_entry = guards.get(instanceOf, {})
                         instance_entry = actor_entry.get(guarded_actor_id, {})
-                        function_entry = instance_entry.get(function.function_identifier, [])
-                        function_entry.append(actor.identifier)
+                        function_entry = instance_entry.get(function.function_identifier, set([]))
+
+                        if actor.identifier in function_entry:
+                            self.parseError('Error: Overlapping guards in ' + actor.identifier + \
+                                    ' for function ' + function.function_identifier)
+
+                        function_entry.add(actor.identifier)
 
                         instance_entry[function.function_identifier] = function_entry
 
@@ -131,10 +133,15 @@ class Analyzer:
                         actor_entry = guards.get(guarded_actor_id, {})
                         for instance in self.symbolTable['actors'][guarded_actor_id]['instances']:
                             instance_entry = actor_entry.get(instance, {})
-                            function_entry = instance_entry.get(function.function_identifier, [])
-                            function_entry.append(actor.identifier)
+                            function_entry = instance_entry.get(function.function_identifier, set([]))
 
+                            if actor.identifier in function_entry:
+                                self.parseError('Error: Overlapping guards in ' + actor.identifier + \
+                                        ' for function ' + function.function_identifier)
+
+                            function_entry.add(actor.identifier)
                             instance_entry[function.function_identifier] = function_entry
+
                             actor_entry[instance] = instance_entry
                         guards[guarded_actor_id] = actor_entry
 
