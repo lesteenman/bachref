@@ -27,7 +27,7 @@ class Mcrl2Generator:
         self.nameGen = Names(symbolTable, 'mcrl2')
 
     def toMcrl2(self):
-        self.emitActionsList(self.symbolTable['actions'])
+        self.emitActionsList(self.symbolTable['actions'], self.symbolTable['guards'])
         self.newline()
         self.emitSorts(self.model.sorts)
         self.newline()
@@ -126,6 +126,9 @@ class Mcrl2Generator:
         
         for act, action in actions.iteritems():
             actor = s.symbolTable['actors'][action['actor']]
+            # pp = PrettyPrinter()
+            # print 'Prettyprint, ' + str(act)
+            # pp.pprint(actor['instances'])
             for instance in actor['instances']:
                 s.emit(s.nameGen.commLabel(instance, action['identifier']))
 
@@ -147,13 +150,15 @@ class Mcrl2Generator:
 
         for act, action in actions.iteritems():
             actor = s.symbolTable['actors'][action['actor']]
+            actor_guards = s.symbolTable['guards'].get(action['actor'], {})
             for instance in actor['instances']:
-                if len(action['guards']) > 0:
+                action_guards = actor_guards.get(instance, {}).get(action['identifier'], [])
+                if len(action_guards) > 0:
                     s.newline()
 
                     s.emit(s.nameGen.actionLabel(instance, action['identifier']))
                     s.emit('|')
-                    for guard in action['guards']:
+                    for guard in action_guards:
                         guard_actor = s.symbolTable['actors'][guard]
                         for guard_instance in guard_actor['instances']:
                             if guard_instance == instance:
@@ -200,22 +205,27 @@ class Mcrl2Generator:
 
         s.endBlock('composition')
 
-    def emitActionsList(s, actions):
+    def emitActionsList(s, actions, guards):
         s.emit('act')
         s.newline()
         s.indent()
 
         for action_id, action in actions.iteritems():
             actor = s.symbolTable['actors'][action['actor']]
-            guards = action['guards']
 
             for instance in actor['instances']:
+                # pp = PrettyPrinter()
+                # print 'Prettyprint, ' + str(action['actor'])
+                # pp.pprint(guards)
+
+                action_guards = guards.get(action['actor'], {}).get(instance, {}).get(action['identifier'], [])
+
                 s.emit(s.nameGen.actionLabel(instance, action['identifier']))
                 s.emit(',')
-                if len(guards) > 0:
+                if len(action_guards) > 0:
                     s.emit(s.nameGen.commLabel(instance, action['identifier']))
                     s.emit(',')
-                    for guard in guards:
+                    for guard in action_guards:
                         guard_actor = s.symbolTable['actors'][guard]
                         for guard_instance in guard_actor['instances']:
                             s.emit(s.nameGen.guardLabel(guard_instance, instance, action['identifier']))
@@ -478,22 +488,33 @@ class Mcrl2Generator:
                 s.emit('!')
             s.emit(comp.prop)
 
+    def instanceOf(self, instance):
+        if instance in self.symbolTable['actors']:
+            return None
+
+        for actor_id, actor in self.symbolTable['actors'].iteritems():
+            if instance in actor['instances']:
+                return actor_id
+        return None
+
     def emitGuards(s, actor_id, actor_instance, guarded_actors):
         s.startBlock('guards')
 
         for guarded_actor in guarded_actors:
+            # Guarded actor will either be an actor or an instance
             guarded_actor_instance = guarded_actor.actor
-            guarded_actor_entry = s.symbolTable['actors'][guarded_actor_instance]
 
-            if 'instances' in guarded_actor_entry:
+            guarded_actor_class = s.instanceOf(guarded_actor_instance)
+            if guarded_actor_class != None:
+                s.emitGuardedActor(actor_id, actor_instance, guarded_actor, guarded_actor_instance)
+            else:
+                guarded_actor_entry = s.symbolTable['actors'][guarded_actor_instance]
                 for instance in guarded_actor_entry['instances']:
                     if instance != actor_instance:
                         s.emitGuardedActor(actor_id, actor_instance, guarded_actor, instance)
                         s.emit('+')
                         s.newline()
                 s.tossline()
-            else:
-                s.emitGuardedActor(actor_id, actor_instance, guarded_actor, guarded_actor_instance)
 
             s.emit('+')
             s.newline()

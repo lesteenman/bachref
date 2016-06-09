@@ -106,22 +106,44 @@ class ControllerGenerator(JavaFileEmitter):
 
     # TODO: Add a function that returns all currently allowed parameters for an action, or null if it's not allowed.
     def emitGuards(s):
-        for action_id, action in s.symbolTable['actions'].iteritems():
-            guards = action['guards']
-            if len(guards):
-                guarded_instances = s.symbolTable['actors'][action['actor']]['instances'].keys()
-                parameters = []
-                parameter_names = []
-                i = 0
-                for param in action['parameters']:
-                    i += 1
-                    parameters.append(param + ' ' + param.lower() + str(i))
-                    parameter_names.append(param.lower() + str(i))
+        for guarded_actor, guarded_instances in s.symbolTable['guards'].iteritems():
+            for guarded_instance, guarded_actions in guarded_instances.iteritems():
+                for action_id, guards in guarded_actions.iteritems():
+                    function_name = s.namegen.camelcase('is_' + guarded_instance + '_' + action_id + '_allowed', True)
+                    action = s.symbolTable['actions'][guarded_actor + '_' + action_id]
 
-                for guarded_instance in guarded_instances:
-                    function_name = s.namegen.camelcase('is_' + guarded_instance + '_' + action['identifier'] + '_allowed', True)
+                    parameters = []
+                    parameter_names = []
+                    i = 0
+                    for param in action['parameters']:
+                        i += 1
+                        parameters.append(param + ' ' + param.lower() + str(i))
+                        parameter_names.append(param.lower() + str(i))
 
-                    s.emitFunctionBlock(name=function_name, returntype='boolean', funcparams=[guards, guarded_instance, action, parameter_names], func=s.isAllowed, params=parameters)
+                    s.emitFunctionBlock(
+                        name=function_name, 
+                        returntype='boolean', 
+                        funcparams=[guards, guarded_instance, action, parameter_names], 
+                        func=s.isAllowed, 
+                        params=parameters
+                    )
+
+        # for action_id, action in s.symbolTable['actions'].iteritems():
+        #     guards = action['guards']
+        #     if len(guards):
+        #         guarded_instances = s.symbolTable['actors'][action['actor']]['instances'].keys()
+        #         parameters = []
+        #         parameter_names = []
+        #         i = 0
+        #         for param in action['parameters']:
+        #             i += 1
+        #             parameters.append(param + ' ' + param.lower() + str(i))
+        #             parameter_names.append(param.lower() + str(i))
+
+        #         for guarded_instance in guarded_instances:
+        #             function_name = s.namegen.camelcase('is_' + guarded_instance + '_' + action['identifier'] + '_allowed', True)
+
+        #             s.emitFunctionBlock(name=function_name, returntype='boolean', funcparams=[guards, guarded_instance, action, parameter_names], func=s.isAllowed, params=parameters)
     
     def emitActions(s):
         for action_id, action in s.symbolTable['actions'].iteritems():
@@ -164,9 +186,11 @@ class ControllerGenerator(JavaFileEmitter):
         s.newline()
 
     def performAction(s, instance, action, parameters):
-
         # Test guard
-        if len(action['guards']):
+        instance_class = s.instanceOf(instance)
+        guards = s.symbolTable['guards'].get(instance_class, {}).get(instance, {}).get(action['identifier'], [])
+
+        if len(guards):
             s.emit('if', '(')
             guard_label = s.namegen.camelcase('is_' + instance + '_' + action['identifier'] + '_allowed', True)
             s.emit('this.' + guard_label, '(')
@@ -191,7 +215,7 @@ class ControllerGenerator(JavaFileEmitter):
         s.emit(')', ';')
         s.newline()
 
-        if len(action['guards']):
+        if len(guards):
             s.unindent()
             s.emit('}', 'else', '{')
             s.newline()

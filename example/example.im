@@ -87,7 +87,7 @@ actors: {
                     }
 
                 guards: {
-                    traffic_light_1: {
+                    light1: {
                         green: {
                             if (is_red == true) {
                                 -> {}

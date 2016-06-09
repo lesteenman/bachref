@@ -71,22 +71,31 @@ class ModelGenerator(JavaFileEmitter):
 
     def emitGuards(s):
         for guarded_actor in s.actor.guarded_actors:
-            guarded_actor_entry = s.symbolTable['actors'][guarded_actor.actor]
-            for guarded_instance in guarded_actor_entry['instances']:
-                for guarded_function in guarded_actor.functions:
-                    guarded_function_entry = s.symbolTable['actions'][guarded_actor.actor + '_' + guarded_function.function_identifier]
-                    guard_label = s.namegen.guardLabel(None, guarded_instance, guarded_function.function_identifier)
+            guarded_actor_class = s.instanceOf(guarded_actor.actor)
 
-                    parameters = []
-                    action_parameters = {}
-                    i = 0
-                    for param in guarded_function_entry['parameters']:
-                        i += 1
-                        parameters.append(param + ' ' + param.lower() + str(i))
-                        action_parameters[param.lower() + str(i)] = param
+            if guarded_actor_class != None:
+                s.emitGuardInstance(guarded_actor, guarded_actor.actor, guarded_actor_class)
+            else:
+                guarded_actor_entry = s.symbolTable['actors'][guarded_actor.actor]
+                for guarded_instance in guarded_actor_entry['instances']:
+                    s.emitGuardInstance(guarded_actor, guarded_instance, guarded_actor.actor)
 
-                    funcparams = [guarded_function, action_parameters]
-                    s.emitFunctionBlock(returntype='boolean', name=guard_label, func=s.guard, funcparams=funcparams, params=parameters)
+    def emitGuardInstance(s, guarded_actor, guarded_instance, guarded_instance_class):
+        for guarded_function in guarded_actor.functions:
+            action_label = guarded_instance_class + '_' + guarded_function.function_identifier
+            guarded_function_entry = s.symbolTable['actions'][action_label]
+            guard_label = s.namegen.guardLabel(None, guarded_instance, guarded_function.function_identifier)
+
+            parameters = []
+            action_parameters = {}
+            i = 0
+            for param in guarded_function_entry['parameters']:
+                i += 1
+                parameters.append(param + ' ' + param.lower() + str(i))
+                action_parameters[param.lower() + str(i)] = param
+
+            funcparams = [guarded_function, action_parameters]
+            s.emitFunctionBlock(returntype='boolean', name=guard_label, func=s.guard, funcparams=funcparams, params=parameters)
 
     def guard(s, guarded_function, action_params):
         inner_function = s.returnTrue

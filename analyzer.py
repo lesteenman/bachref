@@ -40,6 +40,7 @@ class Analyzer:
         self.buildSortsTable()
         self.buildActorsTable()
         self.buildActionsTable()
+        self.buildGuardsTable()
 
         if len(self.parseErrors):
             print 'Errors occured during parsing:'
@@ -72,6 +73,12 @@ class Analyzer:
                     're': re.compile(r'(' + '|'.join(items) + ')')
                 }
 
+    def instanceOf(self, instance):
+        for actor_id, actor in self.symbolTable['actors'].iteritems():
+            if instance in actor['instances']:
+                return actor_id
+        return None
+
     def buildActionsTable(self):
         for actor in self.model.actors:
             for action in actor.actions:
@@ -91,31 +98,67 @@ class Analyzer:
                     'identifier': identifier,
                     'actor': actor.identifier,
                     'parameters': parameters,
-                    'guards': []
                 }
                 self.symbolTable['actions'][action_label] = entry
 
+        # pp = PrettyPrinter()
+        # pp.pprint(self.symbolTable['actions'])
+
+    def buildGuardsTable(self):
+        guards = {}
         for actor in self.model.actors:
             for guarded_actor in actor.guarded_actors:
                 for function in guarded_actor.functions:
-                    action_label = guarded_actor.actor + '_' + function.function_identifier
+                    guarded_actor_id = guarded_actor.actor
+                    instanceOf = self.instanceOf(guarded_actor_id)
+
+                    action_label = '_' + function.function_identifier
+
+                    if instanceOf:
+                        # Actor is the instance in this case
+                        action_label = instanceOf + action_label
+                        actor_entry = guards.get(instanceOf, {})
+                        instance_entry = actor_entry.get(guarded_actor_id, {})
+                        function_entry = instance_entry.get(function.function_identifier, [])
+                        function_entry.append(actor.identifier)
+
+                        instance_entry[function.function_identifier] = function_entry
+
+                        actor_entry[guarded_actor_id] = instance_entry
+                        guards[instanceOf] = actor_entry
+                    else:
+                        action_label = guarded_actor_id + action_label
+                        actor_entry = guards.get(guarded_actor_id, {})
+                        for instance in self.symbolTable['actors'][guarded_actor_id]['instances']:
+                            instance_entry = actor_entry.get(instance, {})
+                            function_entry = instance_entry.get(function.function_identifier, [])
+                            function_entry.append(actor.identifier)
+
+                            instance_entry[function.function_identifier] = function_entry
+                            actor_entry[instance] = instance_entry
+                        guards[guarded_actor_id] = actor_entry
 
                     # Error: Undefined function being guarded
-                    if action_label not in self.symbolTable['actions']:
+                    if action_label not in self.symbolTable['actions'] and instanceOf == None:
                         self.parseError('Error: trying to guard an undefined function ' + \
                                 str(function.function_identifier) + \
-                                ' for actor ' + str(guarded_actor.actor) + \
+                                ' for actor ' + str(guarded_actor_id) + \
                                 ', by actor ' + str(actor.identifier))
+                        continue
                     
                     # Error: Trying to guard itself without other instances being available
-                    if actor.identifier == guarded_actor.actor:
+                    if actor.identifier == guarded_actor_id:
                         # Check if there are other instances of this actor
                         entry = self.symbolTable['actors'][actor.identifier]
                         if len(entry['instances']) <= 1:
                             self.parseError('Error: The only available instance to guard of actor ' + \
                                 str(actor.identifier) + ' at function ' + str(action_label) + ' is the instance itself.')
+                            continue
 
-                    self.symbolTable['actions'][action_label]['guards'].append(actor.identifier)
+        # pp = PrettyPrinter()
+        # pp.pprint(guards)
+        self.symbolTable['guards'] = guards
+
 
     def buildActorsTable(self):
         actors = {}

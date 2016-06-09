@@ -123,6 +123,16 @@ class JavaFileEmitter(object):
         s.current_indent -= 1
 
 
+    def instanceOf(self, instance):
+        if instance in self.symbolTable['actors']:
+            return None
+
+        for actor_id, actor in self.symbolTable['actors'].iteritems():
+            if instance in actor['instances']:
+                return actor_id
+        return None
+
+
     # Some common emits
 
     # Public, returntype, params, func, funcparams

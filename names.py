@@ -25,10 +25,11 @@ class Names:
     def commLabel(self, instance_id, action_id):
         actor = self._getActor(instance_id)
         action = self._getAction(actor['identifier'], action_id)
+        guards = self._getGuards(actor['identifier'], instance_id, action_id)
 
         if self.style == 'mcrl2':
             action_label = instance_id + '_' + action_id
-            if len(action['guards']) > 0:
+            if len(guards) > 0:
                 return 'perform_' + action_label
             else:
                 return action_label
@@ -56,6 +57,14 @@ class Names:
                 return action
 
         return None
+
+    def _getGuards(self, actor_id, instance_id, action_id):
+        for actor_id2, actor in self.symbols['guards'].iteritems():
+            for instance_id2, instance in actor.iteritems():
+                if actor_id2 == actor_id and instance_id2 == instance_id and action_id in instance:
+                    return instance[action_id]
+
+        return []
 
     def camelcase(self, string, lcFirst=False):
         camelCased = ''
