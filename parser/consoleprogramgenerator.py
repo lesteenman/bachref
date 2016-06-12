@@ -27,21 +27,25 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.emitProperties()
         s.newline()
         s.emitFunctionBlock(static=True, returntype='void', name='main', func=s.main, params=['String[] args'])
-        s.emitFunctionBlock(name=s.className, func=s.constructor)
+        s.emitFunctionBlock(name=s.className, func=s.constructor, params=['boolean jtorx'])
         s.emitFunctionBlock(returntype='void', name='handleInput', func=s.handleInput, params=['String input'])
         s.emitFunctionBlock(returntype='void', name='printStates', func=s.printStates)
+        s.emitFunctionBlock(returntype='void', name='output', func=s.output, params=['String output'])
+        s.emitFunctionBlock(returntype='void', name='outputError', func=s.outputError, params=['String output'])
 
         s.closeClass()
 
     def emitProperties(s):
         s.emit('Controller', 'controller', ';')
+        s.emit('boolean', 'jtorx', ';')
         s.newline()
 
     def main(s):
-        s.emit('new ConsoleProgram();')
-        s.newline()
+        s.emitLine('boolean jtorx = args.length > 0 && args[0].equals("jtorx");');
+        s.emitLine('new ConsoleProgram(jtorx);')
 
     def constructor(s):
+        s.emitLine('this.jtorx = jtorx;')
         s.emitLine('this.controller = new Controller() ;')
         s.emitLine('InputStreamReader inputStream = new InputStreamReader(System.in) ;')
         s.emitLine('BufferedReader inputReader = new BufferedReader(inputStream);')
@@ -69,7 +73,7 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.emitLine('} catch (IOException e) {')
         
         s.indent()
-        s.emitLine('System.out.println("Error while reading from console: " + e.getMessage());')
+        s.emitLine('this.outputError("Error while reading from console: " + e.getMessage());')
 
         s.unindent()
         s.emitLine('}')
@@ -96,12 +100,12 @@ class ConsoleProgramGenerator(JavaFileEmitter):
             actor = action['actor']
             instances = s.symbolTable['actors'][actor]['instances'].keys()
             for instance in instances:
-                s.emitInputHandler(action_id, action, instance)
+                s.emitInputHandler(action_id, action, instance, actor)
 
         s.emit('default:')
         s.newline()
         s.indent()
-        s.emit('System.out.println("Unrecognized input: " + method);')
+        s.emit('this.outputError("Unrecognized input: " + method);')
         s.newline()
         s.emit('break;')
         s.newline()
@@ -111,13 +115,21 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.emit('}')
         s.newline()
 
-    def emitInputHandler(s, action_id, action, instance):
-        function_name = s.namegen.camelcase('perform_' + instance + '_' + action['identifier'], True)
+    def emitInputHandler(s, action_id, action, instance, actor_id):
+        function_label = 'perform_' + instance + '_' + action['identifier']
+        function_name = s.namegen.camelcase(function_label, True)
         listen_name = instance + '_' + action['identifier']
         params = action['parameters']
 
         s.emit('case', '"' + listen_name + '"', ':')
         s.newline()
+        
+        # If the action has guards, the MCRL2 name is prefixed with perform_
+        guards = s.symbolTable['guards'].get(actor_id, {}).get(instance, {}).get(action['identifier'], {})
+        if len(guards):
+            s.emit('case', '"' + function_label + '"', ':')
+            s.newline()
+
         s.indent()
 
         if len(params):
@@ -125,7 +137,7 @@ class ConsoleProgramGenerator(JavaFileEmitter):
             s.newline()
             s.indent()
 
-            s.emit('System.out.println("Invalid number of parameters, expected:', str(len(params)), '");')
+            s.emit('this.outputError("Invalid number of parameters, expected:', str(len(params)), '");')
             s.newline()
             s.emit('return;')
             s.newline()
@@ -154,13 +166,13 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.emit('if (result)')
         s.newline()
         s.indent()
-        s.emit('System.out.println("executed");')
+        s.emit('this.output("executed");')
         s.newline()
         s.unindent()
         s.emit('else')
         s.newline()
         s.indent()
-        s.emit('System.out.println("could not execute");')
+        s.emit('this.outputError("could not execute");')
         s.newline()
         s.unindent()
 
@@ -170,7 +182,7 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.newline()
 
     def printStates(s):
-        s.emitLine('System.out.println("Current states:");')
+        s.emitLine('this.output("Current states:");')
         s.emitLine('HashMap<String, HashMap<String, String>> states = this.controller.getStates();')
 
         s.emitLine('Iterator actor_it = states.entrySet().iterator();')
@@ -178,14 +190,24 @@ class ConsoleProgramGenerator(JavaFileEmitter):
         s.indent()
         s.emitLine('Map.Entry actor_pair = (Map.Entry)actor_it.next();')
         s.emitLine('String actor = (String)actor_pair.getKey();')
-        s.emitLine('System.out.println("Actor: " + actor);')
+        s.emitLine('this.output("Actor: " + actor);')
         s.emitLine('Iterator state_it = ((HashMap)actor_pair.getValue()).entrySet().iterator();')
         s.emitLine('while (state_it.hasNext()) {')
         s.indent()
         s.emitLine('Map.Entry state_pair = (Map.Entry)state_it.next();')
-        s.emitLine('System.out.println("\t" + (String)state_pair.getKey() + ":\t" + (String)state_pair.getValue());')
+        s.emitLine('this.output("\t" + (String)state_pair.getKey() + ":\t" + (String)state_pair.getValue());')
         s.unindent()
         s.emitLine('}')
         s.unindent()
         s.emitLine('}')
-        s.emitLine('System.out.println("\\r\\n\\r\\n");')
+        s.emitLine('this.output("\\r\\n\\r\\n");')
+
+    def output(s):
+        s.emitLine('if (!this.jtorx) {')
+        s.indent()
+        s.emitLine('System.out.println(output);')
+        s.unindent()
+        s.emitLine('}')
+
+    def outputError(s):
+        s.emitLine('System.out.println(output);')

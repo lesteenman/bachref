@@ -1,0 +1,38 @@
+ADAPTERKIND STDINOUTADAPTER
+ADDRMLABELANNO false
+ADDRMLABELANNOPREFIX false
+ADDRMLABELANNOSUFFIX false
+ANGELCOMPL false
+COPYDIVSTATES false
+DIVERGENCE false
+GUIDEKIND 
+GUIDETEXT 
+IMPLKIND model
+IMPLTEXT java -cp trafficlights_v2\java trafficlights.ConsoleProgram jtorx
+INSTIMPLTEXT 
+INSTMODELTEXT 
+INTERPINPUTS left_east_red , left_west_red , left_north_red , left_south_red , right_north_yellow , right_west_yellow , right_south_yellow , right_east_yellow , perform_straight_north_green , perform_straight_west_green , perform_straight_south_green , perform_straight_east_green , left_east_yellow , left_west_yellow , left_north_yellow , left_south_yellow , perform_right_north_green , perform_right_west_green , perform_right_south_green , perform_right_east_green , bicycle_south_red , bicycle_north_red , bicycle_east_red , bicycle_west_red , bicycle_south_yellow , bicycle_north_yellow , bicycle_east_yellow , bicycle_west_yellow , straight_north_red , straight_west_red , straight_south_red , straight_east_red , perform_left_east_green , perform_left_west_green , perform_left_north_green , perform_left_south_green , straight_north_yellow , straight_west_yellow , straight_south_yellow , straight_east_yellow , right_north_red , right_west_red , right_south_red , right_east_red , perform_bicycle_south_green , perform_bicycle_north_green , perform_bicycle_east_green , perform_bicycle_west_green
+INTERPKIND ACTIONLIST
+INTERPOUTPUTS 
+MODELKIND model
+MODELTEXT D:\GDrive\Studie\Bachelorreferaat\Research\IM\trafficlights_v2\output.aut
+RECONDELTA false
+SEED 1
+SIMSEED 
+SYNTHDELTA true
+TIMEOUTUNIT MILLISECONDS
+TIMEOUTVAL 1
+TRACEKIND STRACES
+USECOVERAGE false
+USEGUIDE false
+USEIMPLINST false
+USEMODELINST false
+USEREALTIME false
+VIZCOVERAGE false
+VIZGUIDE false
+VIZIMPL false
+VIZLOG false
+VIZMODEL false
+VIZMSC false
+VIZRUN false
+VIZSA false

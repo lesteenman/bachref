@@ -7,7 +7,7 @@ from javagenerator import JavaGenerator
 from analyzer import Analyzer
 import pprint
 
-print 'Traffic Lights...'
+print 'Traffic Lights version 1...'
 with open("../trafficlights_v1/trafficlights.im", 'r') as f:
 	trafficlights = f.read()
 	parser = Parser(trafficlights)
@@ -20,6 +20,25 @@ with open("../trafficlights_v1/trafficlights.im", 'r') as f:
             generator = JavaGenerator(parser.im, analyzer.symbolTable, 'trafficlights')
             java = generator.toJava()
             generator.writeFiles('../trafficlights_v1/java')
+        else:
+            exit(1)
+
+print ''
+print ''
+
+print 'Traffic Lights version 2...'
+with open("../trafficlights_v2/trafficlights.im", 'r') as f:
+	trafficlights = f.read()
+	parser = Parser(trafficlights)
+	parser.parse()
+
+	analyzer = Analyzer(parser.im)
+	correct = analyzer.analyze();
+
+        if correct:
+            generator = JavaGenerator(parser.im, analyzer.symbolTable, 'trafficlights')
+            java = generator.toJava()
+            generator.writeFiles('../trafficlights_v2/java')
         else:
             exit(1)
 

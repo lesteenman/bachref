@@ -1,0 +1,35 @@
+% Every light will turn every color at some point
+
+<true* .
+
+	left_north_red . true* . perform_left_north_green . true* . left_north_yellow . true* . left_north_red
+	. true* .
+	straight_north_red . true* . perform_straight_north_green . true* . straight_north_yellow . true* . straight_north_red
+	. true* .
+	right_north_red . true* . perform_right_north_green . true* . right_north_yellow . true* . right_north_red
+
+	. true* .
+
+	left_east_red . true* . perform_left_east_green . true* . left_east_yellow . true* . left_east_red
+	. true* .
+	straight_east_red . true* . perform_straight_east_green . true* . straight_east_yellow . true* . straight_east_red
+	. true* .
+	right_east_red . true* . perform_right_east_green . true* . right_east_yellow . true* . right_east_red
+
+	. true* .
+
+	left_south_red . true* . perform_left_south_green . true* . left_south_yellow . true* . left_south_red
+	. true* .
+	straight_south_red . true* . perform_straight_south_green . true* . straight_south_yellow . true* . straight_south_red
+	. true* .
+	right_south_red . true* . perform_right_south_green . true* . right_south_yellow . true* . right_south_red
+
+	. true* .
+
+	left_west_red . true* . perform_left_west_green . true* . left_west_yellow . true* . left_west_red
+	. true* .
+	straight_west_red . true* . perform_straight_west_green . true* . straight_west_yellow . true* . straight_west_red
+	. true* .
+	right_west_red . true* . perform_right_west_green . true* . right_west_yellow . true* . right_west_red
+
+> true

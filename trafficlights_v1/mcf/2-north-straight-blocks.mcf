@@ -1,0 +1,11 @@
+% If north straight is green, then the following lights can *not* change color until
+% north straight is red again:
+% - Any western lights
+% - South left
+% - Eastern straight or left
+
+[true* . perform_straight_north_green . (!straight_north_red) . (
+	perform_left_west_green || perform_straight_west_green || perform_left_west_green ||
+	perform_left_south_green ||
+	perform_left_east_green || perform_straight_east_green
+)] false

@@ -1,0 +1,35 @@
+% Verify that each light will turn red after turning yellow
+
+[ true * . (
+
+	(left_north_yellow . (!left_north_red)* . (left_north_green + left_north_yellow))
+	+
+	(straight_north_yellow . (!straight_north_red)* . (straight_north_green + straight_north_yellow))
+	+
+	(right_north_yellow . (!right_north_red)* . (right_north_green + right_north_yellow))
+
+	+
+
+	(left_east_yellow . (!left_east_red)* . (left_east_green + left_east_yellow))
+	+
+	(straight_east_yellow . (!straight_east_red)* . (straight_east_green + straight_east_yellow))
+	+
+	(right_east_yellow . (!right_east_red)* . (right_east_green + right_east_yellow))
+
+	+
+
+	(left_south_yellow . (!left_south_red)* . (left_south_green + left_south_yellow))
+	+
+	(straight_south_yellow . (!straight_south_red)* . (straight_south_green + straight_south_yellow))
+	+
+	(right_south_yellow . (!right_south_red)* . (right_south_green + right_south_yellow))
+
+	+
+
+	(left_west_yellow . (!left_west_red)* . (left_west_green + left_west_yellow))
+	+
+	(straight_west_yellow . (!straight_west_red)* . (straight_west_green + straight_west_yellow))
+	+
+	(right_west_yellow . (!right_west_red)* . (right_west_green + right_west_yellow))
+
+) ] false

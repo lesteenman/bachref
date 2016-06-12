@@ -5,7 +5,6 @@ sorts: {
 
 actors: {
     straight_light: {
-        # Test
         states: {
             winddir: WindDir
             color: Color

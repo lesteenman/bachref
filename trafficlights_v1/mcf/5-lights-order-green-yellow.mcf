@@ -1,0 +1,35 @@
+% Verify that each light will turn yellow after turning green
+
+[ true * . (
+
+	(perform_left_north_green . (!left_north_yellow)* . (left_north_red + perform_left_north_green))
+	+
+	(perform_straight_north_green . (!straight_north_yellow)* . (straight_north_red + perform_straight_north_green))
+	+
+	(perform_right_north_green . (!right_north_yellow)* . (right_north_red + perform_right_north_green))
+
+	+
+
+	(perform_left_east_green . (!left_east_yellow)* . (left_east_red + perform_left_east_green))
+	+
+	(perform_straight_east_green . (!straight_east_yellow)* . (straight_east_red + perform_straight_east_green))
+	+
+	(perform_right_east_green . (!right_east_yellow)* . (right_east_red + perform_right_east_green))
+
+	+
+
+	(perform_left_south_green . (!left_south_yellow)* . (left_south_red + perform_left_south_green))
+	+
+	(perform_straight_south_green . (!straight_south_yellow)* . (straight_south_red + perform_straight_south_green))
+	+
+	(perform_right_south_green . (!right_south_yellow)* . (right_south_red + perform_right_south_green))
+
+	+
+
+	(perform_left_west_green . (!left_west_yellow)* . (left_west_red + perform_left_west_green))
+	+
+	(perform_straight_west_green . (!straight_west_yellow)* . (straight_west_red + perform_straight_west_green))
+	+
+	(perform_right_west_green . (!right_west_yellow)* . (right_west_red + perform_right_west_green))
+
+) ] false
